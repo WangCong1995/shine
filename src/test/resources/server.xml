@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+ <!--suppress SpringFacetInspection -->
+<beans xmlns="http://www.springframework.org/schema/beans"
+ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+ xmlns:shine="http://bow.com/schema/shine"
+ xsi:schemaLocation="http://www.springframework.org/schema/beans 
+ http://www.springframework.org/schema/beans/spring-beans.xsd
+ http://bow.com/schema/shine  http://bow.com/schema/shine/shine.xsd">
+
+
+    <bean id="springUtils" class="com.bow.common.utils.SpringUtils"/>
+
+    <bean id="defaultCalculator" class="com.bow.demo.DefaultCalculator"></bean>
+
+    <shine:service  id="calculatorService" interface="com.bow.demo.Calculator" ref="defaultCalculator"></shine:service>
+    <shine:service  id="calculatorService2" interface="com.bow.demo.Calculator" ref="defaultCalculator"></shine:service>
+
+ </beans>

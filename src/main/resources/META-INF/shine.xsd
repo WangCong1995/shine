@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<xsd:schema xmlns="http://bow.com/schema/shine"
+        xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
+        targetNamespace="http://bow.com/schema/shine">
+
+        <xsd:element name="service" type="serviceType">
+                <xsd:annotation>
+                        <xsd:documentation><![CDATA[ Export service config ]]></xsd:documentation>
+                </xsd:annotation>
+        </xsd:element>
+        <xsd:complexType name="serviceType">
+                <xsd:attribute name="id" type="xsd:ID" />
+                <xsd:attribute name="ref" type="xsd:string" />
+                <xsd:attribute name="interface" type="xsd:string" />
+        </xsd:complexType>
+
+
+        <xsd:element name="reference" type="referenceType">
+                <xsd:annotation>
+                        <xsd:documentation><![CDATA[ Import service config ]]></xsd:documentation>
+                </xsd:annotation>
+        </xsd:element>
+        <xsd:complexType name="referenceType">
+                <xsd:attribute name="id" type="xsd:ID" />
+                <xsd:attribute name="interface" type="xsd:string" />
+        </xsd:complexType>
+
+
+</xsd:schema>
