@@ -8,11 +8,10 @@
  http://bow.com/schema/shine  http://bow.com/schema/shine/shine.xsd">
 
 
-    <bean id="springUtils" class="com.bow.common.utils.SpringUtils"/>
+    <bean id="defaultCalculator" class="com.bow.demo.DefaultCalculator" />
+    <bean id="hessianRegistryService" class="com.bow.registry.HessianRegistryService" />
 
-    <bean id="defaultCalculator" class="com.bow.demo.DefaultCalculator"></bean>
-
-    <shine:service  id="calculatorService" interface="com.bow.demo.Calculator" ref="defaultCalculator"></shine:service>
-    <shine:service  id="calculatorService2" interface="com.bow.demo.Calculator" ref="defaultCalculator"></shine:service>
+    <shine:service  id="calculatorService" interface="com.bow.demo.Calculator" ref="defaultCalculator" />
+    <shine:service  id="registryService" interface="com.bow.registry.RegistryService" ref="hessianRegistryService" />
 
  </beans>

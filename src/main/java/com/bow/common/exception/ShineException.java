@@ -9,6 +9,14 @@ public class ShineException extends RuntimeException {
         super(ShineExceptionCode.fail.toString());
     }
 
+    public ShineException(ShineExceptionCode code){
+        this(code.toString());
+    }
+
+    public ShineException(ShineExceptionCode code,Throwable e){
+        this(code.toString(),e);
+    }
+
     public ShineException(String message){
         super(message);
     }

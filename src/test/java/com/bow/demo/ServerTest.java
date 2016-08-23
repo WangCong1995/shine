@@ -14,6 +14,8 @@ import java.util.Map;
 public class ServerTest {
     public static void main(String[] args) {
         ApplicationContext context = new ClassPathXmlApplicationContext("server.xml");
+        ServiceBean<DefaultCalculator> bean = context.getBean("calculatorService",ServiceBean.class);
+        System.out.println(bean.getRef());
 
     }
 }

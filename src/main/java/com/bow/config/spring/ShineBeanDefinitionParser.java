@@ -5,6 +5,7 @@ import com.bow.config.ServiceBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.beans.factory.support.RootBeanDefinition;
 import org.springframework.beans.factory.xml.BeanDefinitionParser;
 import org.springframework.beans.factory.xml.ParserContext;
@@ -41,7 +42,8 @@ public class ShineBeanDefinitionParser implements BeanDefinitionParser {
 
         if(ServiceBean.class.equals(beanClass)){
             String refId = element.getAttribute("ref");
-            beanDefinition.getPropertyValues().addPropertyValue("ref", refId);
+            RuntimeBeanReference ref = new RuntimeBeanReference(refId);
+            beanDefinition.getPropertyValues().addPropertyValue("ref", ref);
         }
 
         parserContext.getRegistry().registerBeanDefinition(id, beanDefinition);

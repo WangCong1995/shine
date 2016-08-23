@@ -12,6 +12,7 @@
                 <xsd:attribute name="id" type="xsd:ID" />
                 <xsd:attribute name="ref" type="xsd:string" />
                 <xsd:attribute name="interface" type="xsd:string" />
+                <xsd:attribute name="group" type="xsd:string" />
         </xsd:complexType>
 
 
@@ -23,6 +24,7 @@
         <xsd:complexType name="referenceType">
                 <xsd:attribute name="id" type="xsd:ID" />
                 <xsd:attribute name="interface" type="xsd:string" />
+                <xsd:attribute name="group" type="xsd:string" />
         </xsd:complexType>
 
 

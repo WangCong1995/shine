@@ -3,7 +3,7 @@ package com.bow.config;
 /**
  * Created by vv on 2016/8/19.
  */
-public class ServiceConfig {
+public class ServiceConfig<T> {
 
     private String id;
 
@@ -11,7 +11,15 @@ public class ServiceConfig {
 
     private Class<?> interfaceClass;
 
-    private String ref;
+    /**
+     * 实现类对应的实例
+     */
+    private T ref;
+
+    /**
+     * 默认祖名default
+     */
+    private String group="default";
 
 
     public String getId() {
@@ -38,11 +46,23 @@ public class ServiceConfig {
         this.interfaceClass = interfaceClass;
     }
 
-    public String getRef() {
+    public T getRef() {
         return ref;
     }
 
-    public void setRef(String ref) {
+    public void setRef(T ref) {
         this.ref = ref;
+    }
+
+    public String getGroup() {
+        return group;
+    }
+
+    public void setGroup(String group) {
+        this.group = group;
+    }
+
+    public String getKey(){
+        return group+"#"+interfaceName;
     }
 }
