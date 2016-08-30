@@ -1,8 +1,8 @@
 package com.bow.registry;
 
 import com.bow.config.ServiceConfig;
+import com.bow.rpc.URL;
 
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -30,5 +30,10 @@ public class HessianRegistryService implements RegistryService {
     public boolean register(ServiceConfig serviceConfig, URL providerUrl) {
         repository.add(new ServiceInfo(serviceConfig,providerUrl));
         return true;
+    }
+
+    @Override
+    public String getName() {
+        return "hessian";
     }
 }

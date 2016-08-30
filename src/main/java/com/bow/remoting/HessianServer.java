@@ -21,8 +21,6 @@ public class HessianServer extends AbstractShineServer {
         connector.setPort(ShineConfig.getservicePort());
         server.addConnector(connector);
 
-
-
         // 添加servlet
         ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
         context.setContextPath("/");

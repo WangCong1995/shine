@@ -1,8 +1,8 @@
 package com.bow.registry;
 
 import com.bow.config.ServiceConfig;
+import com.bow.rpc.URL;
 
-import java.net.URL;
 
 /**
  * Created by vv on 2016/8/21.

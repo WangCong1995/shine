@@ -2,8 +2,7 @@ package com.bow.remoting;
 
 import com.bow.rpc.Message;
 import com.bow.rpc.Result;
-
-import java.net.URL;
+import com.bow.rpc.URL;
 
 
 /**

@@ -4,10 +4,10 @@ import com.bow.common.exception.ShineException;
 import com.bow.common.exception.ShineExceptionCode;
 import com.bow.config.ServiceConfig;
 import com.bow.config.ShineConfig;
+import com.bow.rpc.URL;
 import com.caucho.hessian.client.HessianProxyFactory;
 
 import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.List;
 
 /**
@@ -22,7 +22,7 @@ public class HessianRegistry implements RegistryService {
         String registryLocation = "http://"+ShineConfig.getRegistryUrl();
         HessianProxyFactory factory = new HessianProxyFactory();
         try {
-            RegistryService proxy =(RegistryService)factory.create(RegistryService.class,registryLocation);
+            proxy =(RegistryService)factory.create(RegistryService.class,registryLocation);
         } catch (MalformedURLException e) {
             throw new ShineException(ShineExceptionCode.fail,e);
         }

@@ -4,12 +4,12 @@ import com.bow.common.exception.ShineException;
 import com.bow.common.exception.ShineExceptionCode;
 import com.bow.rpc.Message;
 import com.bow.rpc.Result;
+import com.bow.rpc.URL;
 import com.caucho.hessian.client.HessianProxyFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.MalformedURLException;
-import java.net.URL;
 
 /**
  * Created by vv on 2016/8/21.

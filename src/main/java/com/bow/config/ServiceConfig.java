@@ -7,6 +7,9 @@ public class ServiceConfig<T> {
 
     private String id;
 
+    /**
+     * 接口全限定名
+     */
     private String interfaceName;
 
     private Class<?> interfaceClass;
