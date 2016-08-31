@@ -19,6 +19,10 @@ public class CuratorZookeeperClient extends AbstractZookeeperClient<CuratorWatch
 
     private final CuratorFramework client;
 
+    /**
+     * 创建客户端
+     * @param url zookeeper地址
+     */
     public CuratorZookeeperClient(URL url) {
         super(url);
         Builder builder = CuratorFrameworkFactory.builder().connectString(url.getAddress())
@@ -100,18 +104,36 @@ public class CuratorZookeeperClient extends AbstractZookeeperClient<CuratorWatch
             this.listener = null;
         }
 
+        /**
+         * 当有事件发生就将发生节点路径及其子节点路径传给childChanged()
+         * @param event
+         * @throws Exception
+         */
         public void process(WatchedEvent event) throws Exception {
             if (listener != null) {
+                //在处理事件之前对其下一级子节点绑定监听器
                 listener.childChanged(event.getPath(),
                         client.getChildren().usingWatcher(this).forPath(event.getPath()));
             }
         }
     }
 
+    /**
+     * 为path的子节点创建监听器
+     * @param path
+     * @param listener
+     * @return
+     */
     public CuratorWatcher createTargetChildListener(String path, ChildListener listener) {
         return new CuratorWatcherImpl(listener);
     }
 
+    /**
+     * 给path的children 绑定一个监听器
+     * @param path
+     * @param listener
+     * @return
+     */
     public List<String> addTargetChildListener(String path, CuratorWatcher listener) {
         try {
             return client.getChildren().usingWatcher(listener).forPath(path);
