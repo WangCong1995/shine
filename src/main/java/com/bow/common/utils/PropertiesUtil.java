@@ -1,15 +1,16 @@
 package com.bow.common.utils;
 
+import com.bow.common.exception.ShineException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Enumeration;
 import java.util.Properties;
 
 /**
- * Created by vv on 2016/8/19.
+ * @author vv
+ * @since 2016/8/19
  */
 public class PropertiesUtil {
     private static final Logger logger = LoggerFactory.getLogger(PropertiesUtil.class);
@@ -21,40 +22,35 @@ public class PropertiesUtil {
 
     private static Properties properties = new Properties();
 
-    static{
-        for(String url:DEFAULT_PROPERTIES_URL){
+    static {
+        for (String url : DEFAULT_PROPERTIES_URL) {
             loadFile(url);
         }
     }
 
-    private static void loadFile(String fileUrl)
-    {
+    private static void loadFile(String fileUrl) {
         InputStream is = PropertiesUtil.class.getClassLoader().getResourceAsStream(fileUrl);
 
-        try
-        {
+        try {
             properties.load(is);
-        }
-        catch (IOException e)
-        {
-            logger.error("IOException when load" + fileUrl, e);
-        }
-        finally
-        {
-            try
-            {
-                if(is != null){
+        } catch (IOException e) {
+            throw new ShineException("IOException when load" + fileUrl, e);
+        } finally {
+            try {
+                if (is != null) {
                     is.close();
                 }
-            }
-            catch (IOException e)
-            {
+            } catch (IOException e) {
                 logger.error("IOException when close inputStream " + fileUrl, e);
             }
         }
     }
 
-    public static String getProperty(String key){
+    public static String getProperty(String key) {
         return properties.getProperty(key);
+    }
+
+    public static String getProperty(String key, String defaultValue) {
+        return properties.getProperty(key, defaultValue);
     }
 }

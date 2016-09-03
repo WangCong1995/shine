@@ -1,17 +1,16 @@
 package com.bow.remoting;
 
-import com.bow.rpc.RequestHandler;
+import com.bow.rpc.RequestHandlerAware;
 
 /**
- * 负责接收请求,并从请求中分析出调用的服务名
- * Created by vv on 2016/8/19.
+ * receive & reply client request
+ * @author vv
+ * @since 2016/8/19
  */
-public interface ShineServer {
+public interface ShineServer extends RequestHandlerAware{
 
     boolean start();
 
     boolean stop();
-
-    void setRequestHandler(RequestHandler requestHandler);
 
 }

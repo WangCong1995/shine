@@ -1,9 +1,15 @@
 package com.bow.rpc;
 
+import com.alibaba.fastjson.JSON;
+
+import java.io.Serializable;
+import java.util.Arrays;
+
 /**
+ * 传递到服务器的信息
  * Created by vv on 2016/8/20.
  */
-public class Message {
+public class Message implements Serializable {
 
     private String group = "default";
     private String interfaceName;
@@ -49,5 +55,20 @@ public class Message {
 
     public void setGroup(String group) {
         this.group = group;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(group).append("#");
+        sb.append(interfaceName).append("#").append(methodName);
+        sb.append("(");
+        if(parameters!=null){
+            for(Object param:parameters){
+                sb.append(JSON.toJSONString(param));
+            }
+        }
+        sb.append(")");
+        return  sb.toString();
     }
 }

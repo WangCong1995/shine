@@ -9,7 +9,8 @@ import org.eclipse.jetty.servlet.ServletHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 
 /**
- * Created by vv on 2016/8/20.
+ * @author vv
+ * @since 2016/8/20.
  */
 public class HessianServer extends AbstractShineServer {
 
@@ -18,7 +19,7 @@ public class HessianServer extends AbstractShineServer {
         Server server = new Server();
         ServerConnector connector = new ServerConnector(server);
         connector.setHost(NetUtil.getLocalHostAddress());
-        connector.setPort(ShineConfig.getservicePort());
+        connector.setPort(ShineConfig.getServicePort());
         server.addConnector(connector);
 
         // 添加servlet

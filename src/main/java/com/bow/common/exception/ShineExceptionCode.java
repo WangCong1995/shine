@@ -1,12 +1,25 @@
 package com.bow.common.exception;
 
 /**
- * Created by vv on 2016/8/19.
+ * @author vv
+ * @since 2016/8/19
  */
 public enum ShineExceptionCode {
     success(0,"success"),
+    /**
+     * default description
+     */
     fail(1,"shine exception"),
-    configException(101,"config error");
+
+    /**
+     * user config error
+     */
+    configException(101,"config error"),
+
+    /**
+     * can not connect the remote url
+     */
+    connectionException(102,"connection exception");
 
     private int code;
     private String message;

@@ -7,7 +7,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Created by vv on 2016/8/21.
+ * @author vv
+ * @since 2016/8/21.
  */
 public class ShineConfig {
     private static final Logger logger = LoggerFactory.getLogger(ShineConfig.class);
@@ -16,12 +17,17 @@ public class ShineConfig {
     private String protocol;
     private int servicePort;
     private String registryUrl;
+    /**
+     * zookeeper , hessian , redis and so on
+     */
+    private String registryType;
 
     private ShineConfig(){
         try{
             protocol = PropertiesUtil.getProperty("protocol");
-            servicePort = Integer.parseInt(PropertiesUtil.getProperty("service.port"));
+            servicePort = Integer.parseInt(PropertiesUtil.getProperty("service.port","9000"));
             registryUrl = PropertiesUtil.getProperty("registry.url");
+            registryType = PropertiesUtil.getProperty("registry.type");
         }catch (Exception e){
             logger.error(ShineExceptionCode.configException.toString(),e);
             throw new ShineException(ShineExceptionCode.configException,e);
@@ -33,7 +39,7 @@ public class ShineConfig {
         return config.protocol;
     }
 
-    public static int getservicePort() {
+    public static int getServicePort() {
         return config.servicePort;
     }
 
@@ -41,7 +47,7 @@ public class ShineConfig {
         return config.registryUrl;
     }
 
-    public void setRegistryUrl(String registryUrl) {
-        this.registryUrl = registryUrl;
+    public static String getRegistryType() {
+        return  config.registryType;
     }
 }

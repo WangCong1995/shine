@@ -1,5 +1,7 @@
 package com.bow.config;
 
+import com.bow.rpc.Protocol;
+import com.bow.rpc.ProtocolFactory;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 
@@ -14,7 +16,10 @@ public class ServiceBean<T> extends ServiceConfig implements InitializingBean, D
 
     @Override
     public void afterPropertiesSet() throws Exception {
+        Protocol protocol = ProtocolFactory.getProtocol("hessian");
+        protocol.export(this);
         //做配置校验
-        System.out.println("begin");
+        //export service
+
     }
 }
