@@ -2,6 +2,7 @@ package com.bow.config;
 
 import com.bow.common.exception.ShineException;
 import com.bow.common.exception.ShineExceptionCode;
+import com.bow.common.utils.SpringContext;
 import com.bow.rpc.Message;
 import com.bow.rpc.Protocol;
 import com.bow.rpc.ProtocolFactory;
@@ -28,7 +29,7 @@ public class ReferenceBean extends ReferenceConfig implements FactoryBean<Object
 
     @Override
     public Object invoke(MethodInvocation methodInvocation) throws Throwable {
-        Protocol protocol = ProtocolFactory.getProtocol("hessian");
+        Protocol protocol = SpringContext.getBean(Protocol.class);
         Message message = invocationToMessage(methodInvocation);
         Result result = protocol.refer(message);
         if(result.getCause()!=null){
@@ -55,6 +56,7 @@ public class ReferenceBean extends ReferenceConfig implements FactoryBean<Object
 
     @Override
     public Object getObject() throws Exception {
+        //getBean获取的是业务接口的代理
         return proxy;
     }
 

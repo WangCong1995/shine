@@ -21,7 +21,7 @@ import io.netty.handler.ssl.util.SelfSignedCertificate;
  * Netty Server
  * Created by vv on 2016/9/3.
  */
-public class NettyServer implements ShineServer{
+public class NettyServer{
 
     private static final boolean SSL = false;
 

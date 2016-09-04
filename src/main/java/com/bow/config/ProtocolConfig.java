@@ -2,18 +2,13 @@ package com.bow.config;
 
 /**
  * @author vv
- * @since 2016/8/19.
+ * @since 2016/9/4.
  */
-public class RegistryConfig {
+public class ProtocolConfig {
 
     private String id;
-
-    /**
-     * zookeeper, hessian
-     */
     private String name;
-
-    private String address;
+    private int port;
 
     public String getId() {
         return id;
@@ -31,11 +26,11 @@ public class RegistryConfig {
         this.name = name;
     }
 
-    public String getAddress() {
-        return address;
+    public int getPort() {
+        return port;
     }
 
-    public void setAddress(String address) {
-        this.address = address;
+    public void setPort(int port) {
+        this.port = port;
     }
 }

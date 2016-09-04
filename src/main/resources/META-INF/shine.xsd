@@ -1,31 +1,72 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <xsd:schema xmlns="http://bow.com/schema/shine"
-        xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
+        xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+        xmlns:beans="http://www.springframework.org/schema/beans"
         targetNamespace="http://bow.com/schema/shine">
 
+        <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
+        <xsd:import namespace="http://www.springframework.org/schema/beans"/>
+
+        <!-- SERVICE -->
         <xsd:element name="service" type="serviceType">
                 <xsd:annotation>
                         <xsd:documentation><![CDATA[ Export service config ]]></xsd:documentation>
                 </xsd:annotation>
         </xsd:element>
         <xsd:complexType name="serviceType">
-                <xsd:attribute name="id" type="xsd:ID" />
+                <xsd:choice minOccurs="0" maxOccurs="unbounded">
+                        <xsd:element ref="beans:property" minOccurs="0" maxOccurs="unbounded" />
+                </xsd:choice>
+                <xsd:attribute name="id" type="xsd:ID" use="required"/>
                 <xsd:attribute name="ref" type="xsd:string" />
+                <xsd:attribute name="class" type="xsd:string" />
                 <xsd:attribute name="interface" type="xsd:string" />
                 <xsd:attribute name="group" type="xsd:string" />
+                <xsd:attribute name="version" type="xsd:string" use="optional" default="0.0.0"/>
         </xsd:complexType>
 
 
+        <!-- REFERENCE -->
         <xsd:element name="reference" type="referenceType">
                 <xsd:annotation>
                         <xsd:documentation><![CDATA[ Import service config ]]></xsd:documentation>
                 </xsd:annotation>
         </xsd:element>
         <xsd:complexType name="referenceType">
-                <xsd:attribute name="id" type="xsd:ID" />
+                <xsd:attribute name="id" type="xsd:ID" use="required"/>
                 <xsd:attribute name="interface" type="xsd:string" />
                 <xsd:attribute name="group" type="xsd:string" />
+                <xsd:attribute name="version" type="xsd:string" />
+                <xsd:attribute name="mockServiceRef" type="xsd:string" />
         </xsd:complexType>
+
+
+        <!-- REGISTRY -->
+        <xsd:element name="registry" type="registryType">
+                <xsd:annotation>
+                        <xsd:documentation><![CDATA[ registry config ]]></xsd:documentation>
+                </xsd:annotation>
+        </xsd:element>
+        <xsd:complexType name="registryType">
+                <xsd:attribute name="id" type="xsd:ID" use="required" />
+                <xsd:attribute name="name" type="xsd:string" />
+                <xsd:attribute name="address" type="xsd:string" />
+        </xsd:complexType>
+
+
+        <!-- PROTOCOL -->
+        <xsd:element name="protocol" type="protocolType">
+                <xsd:annotation>
+                        <xsd:documentation><![CDATA[ protocol config ]]></xsd:documentation>
+                </xsd:annotation>
+        </xsd:element>
+        <xsd:complexType name="protocolType">
+                <xsd:attribute name="id" type="xsd:ID" />
+                <xsd:attribute name="name" type="xsd:string" />
+                <xsd:attribute name="address" type="xsd:string" />
+                <xsd:attribute name="port" type="xsd:integer" />
+        </xsd:complexType>
+
 
 
 </xsd:schema>

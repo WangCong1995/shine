@@ -1,11 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
  <beans xmlns="http://www.springframework.org/schema/beans" 
- xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
  xmlns:shine="http://bow.com/schema/shine"
  xsi:schemaLocation="http://www.springframework.org/schema/beans 
  http://www.springframework.org/schema/beans/spring-beans.xsd
  http://bow.com/schema/shine  http://bow.com/schema/shine/shine.xsd
 ">
 
-	<shine:reference id="c1" interface="com.bow.demo.Calculator" group="vv" />
+    <shine:protocol id="netty" name="netty" port="9000" />
+
+    <shine:registry id="zookeeper" name="zookeeper" address="zookeeper://127.0.0.1:2181"/>
+
+    <bean id="mockServiceDemo" class="com.bow.demo.FailFastService"></bean>
+	<shine:reference id="c1" interface="com.bow.demo.Calculator"
+                     group="vv" version="1.0.0"
+                     mockServiceRef="mockServiceDemo"/>
+
  </beans>

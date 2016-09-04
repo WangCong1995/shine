@@ -4,6 +4,7 @@ import com.bow.common.exception.ShineException;
 import com.bow.common.exception.ShineExceptionCode;
 import com.bow.config.ServiceBean;
 import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.beans.factory.config.BeanDefinitionHolder;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.beans.factory.support.RootBeanDefinition;
 import org.springframework.beans.factory.xml.BeanDefinitionParser;
@@ -13,42 +14,50 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 /**
+ * parse element like
+ * <p>
+ * <shine:service id="calculatorService" interface="com.bow.demo.Calculator" ref
+ * ="defaultCalculator" />
+ * 
  * @author vv
- * @since 2016/8/19.
+ * @since 2016/9/4.
  */
-public class ShineBeanDefinitionParser implements BeanDefinitionParser {
-
-
-    private Class<?> beanClass;
-
-    public ShineBeanDefinitionParser(Class<?> beanClass){
-        this.beanClass = beanClass;
-    }
+public class ServiceBeanDefinitionParser implements BeanDefinitionParser {
     @Override
     public BeanDefinition parse(Element element, ParserContext parserContext) {
-        //Object source = parserContext.extractSource(element);
         RootBeanDefinition beanDefinition = new RootBeanDefinition();
-        beanDefinition.setBeanClass(beanClass);
+        beanDefinition.setBeanClass(ServiceBean.class);
 
         String id = element.getAttribute("id");
         beanDefinition.getPropertyValues().addPropertyValue("id", id);
 
         String interfaceName = element.getAttribute("interface");
         beanDefinition.getPropertyValues().addPropertyValue("interfaceName", interfaceName);
+
+        String refId = element.getAttribute("ref");
+        String className = element.getAttribute("class");
+
         try {
+            //init service instance
+            if(refId!=null && refId.length()>0){
+                RuntimeBeanReference ref = new RuntimeBeanReference(refId);
+                beanDefinition.getPropertyValues().addPropertyValue("ref", ref);
+            }else if(className != null && className.length() > 0){
+                RootBeanDefinition classDefinition = new RootBeanDefinition();
+                classDefinition.setBeanClass(Class.forName(className));
+                classDefinition.setLazyInit(false);
+                //user can config the specified className's property
+                parseProperties(element.getChildNodes(), classDefinition);
+                beanDefinition.getPropertyValues().addPropertyValue("ref", new BeanDefinitionHolder(classDefinition, id + "Impl"));
+
+            }else{
+                throw new ShineException("can't find ref or class in service bean "+id);
+            }
             beanDefinition.getPropertyValues().addPropertyValue("interfaceClass", Class.forName(interfaceName));
         } catch (ClassNotFoundException e) {
             throw new ShineException(ShineExceptionCode.configException,e);
         }
 
-
-        if(ServiceBean.class.equals(beanClass)){
-            String refId = element.getAttribute("ref");
-            RuntimeBeanReference ref = new RuntimeBeanReference(refId);
-            beanDefinition.getPropertyValues().addPropertyValue("ref", ref);
-        }
-
-        parseProperties(element.getChildNodes(), beanDefinition);
         parserContext.getRegistry().registerBeanDefinition(id, beanDefinition);
         beanDefinition.setLazyInit(false);
         return beanDefinition;

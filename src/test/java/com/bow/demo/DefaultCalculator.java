@@ -5,8 +5,19 @@ package com.bow.demo;
  */
 public class DefaultCalculator implements Calculator {
 
+    private String calculatorName;
+
     @Override
     public int calculate(int a, int b) {
         return (a+b)*2;
+    }
+
+
+    public String getCalculatorName() {
+        return calculatorName;
+    }
+
+    public void setCalculatorName(String calculatorName) {
+        this.calculatorName = calculatorName;
     }
 }

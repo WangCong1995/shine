@@ -1,5 +1,6 @@
 package com.bow.config;
 
+
 /**
  * Created by vv on 2016/8/19.
  */
@@ -9,6 +10,26 @@ public class ReferenceConfig {
     private String interfaceName;
     private Class<?> interfaceClass;
     private String group;
+
+    private String version;
+
+    private Object mockServiceRef;
+
+    public Object getMockServiceRef() {
+        return mockServiceRef;
+    }
+
+    public void setMockServiceRef(Object mockServiceRef) {
+        this.mockServiceRef = mockServiceRef;
+    }
+
+    public String getVersion() {
+        return version;
+    }
+
+    public void setVersion(String version) {
+        this.version = version;
+    }
 
     public String getId() {
         return id;

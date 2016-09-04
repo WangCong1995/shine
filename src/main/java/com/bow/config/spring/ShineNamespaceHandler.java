@@ -11,7 +11,7 @@ public class ShineNamespaceHandler extends NamespaceHandlerSupport {
 
     @Override
     public void init() {
-        registerBeanDefinitionParser("service", new ShineBeanDefinitionParser(ServiceBean.class));
-        registerBeanDefinitionParser("reference", new ShineBeanDefinitionParser(ReferenceBean.class));
+        registerBeanDefinitionParser("service", new ServiceBeanDefinitionParser());
+        registerBeanDefinitionParser("reference", new ReferenceBeanDefinitionParser());
     }
 }

@@ -1,11 +1,26 @@
 package com.bow.common;
 
+import java.util.regex.Pattern;
+
 /**
  * Created by vv on 2016/8/30.
  */
 public class Version implements Comparable<Version> {
 
+    private static final String SEPARATOR = ".";
+    private static final Pattern VERSION_PATTERN = Pattern.compile("\\d+\\.\\d+\\.\\d+");
     public Version(){}
+
+    public Version(String version){
+        if(VERSION_PATTERN.matcher(version).matches()){
+            String[] vs = version.split(SEPARATOR);
+            if(vs.length==3){
+                major = Integer.parseInt(vs[0]);
+                minor = Integer.parseInt(vs[1]);
+                batch = Integer.parseInt(vs[2]);
+            }
+        }
+    }
 
     public Version(int major){
         this(major,0,0);
@@ -73,7 +88,12 @@ public class Version implements Comparable<Version> {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append(major).append(".").append(minor).append(".").append(batch);
+        sb.append(major).append(SEPARATOR).append(minor).append(SEPARATOR).append(batch);
         return sb.toString();
+    }
+
+    public static void main(String[] args) {
+        boolean re = VERSION_PATTERN.matcher("1.1..2").matches();
+        System.out.println(re);
     }
 }
