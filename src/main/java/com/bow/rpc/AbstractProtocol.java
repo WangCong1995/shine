@@ -8,11 +8,13 @@ import com.bow.registry.RegistryService;
 import com.bow.remoting.HessianClient;
 import com.bow.remoting.HessianServer;
 import com.bow.remoting.ShineClient;
+import com.bow.remoting.ShineFuture;
 import com.bow.remoting.ShineServer;
 
 import java.lang.reflect.Method;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 /**
  * Protocol template
@@ -50,6 +52,20 @@ public abstract class AbstractProtocol implements Protocol {
                 result.setCause(e);
             }
             return result;
+        }
+    };
+
+    /**
+     * client 发送请求后，会调用ShineFuture#get()等待结果返回
+     */
+    private ConcurrentMap<String, ShineFuture> syncFutureMap = new ConcurrentHashMap();
+    /**
+     * 需要此handler记录我之前是用的哪个future进行等待的
+     */
+    protected ResponseHandler responseHandler = new ResponseHandler() {
+        @Override
+        public void handle(Result result) {
+
         }
     };
 

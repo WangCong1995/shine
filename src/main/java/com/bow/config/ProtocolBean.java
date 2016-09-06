@@ -1,6 +1,7 @@
 package com.bow.config;
 
 import com.bow.rpc.Protocol;
+import com.bow.rpc.ProtocolFactory;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
 
@@ -11,7 +12,7 @@ import org.springframework.beans.factory.InitializingBean;
 public class ProtocolBean extends ProtocolConfig implements FactoryBean,InitializingBean {
     @Override
     public Object getObject() throws Exception {
-        return null;
+        return this;
     }
 
     @Override

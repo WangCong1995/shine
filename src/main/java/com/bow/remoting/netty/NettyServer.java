@@ -1,7 +1,12 @@
 package com.bow.remoting.netty;
 
+import com.bow.common.exception.ShineException;
+import com.bow.common.exception.ShineExceptionCode;
+import com.bow.config.ShineConfig;
 import com.bow.remoting.ShineServer;
+import com.bow.rpc.RequestHandler;
 import io.netty.bootstrap.ServerBootstrap;
+import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.EventLoopGroup;
@@ -16,20 +21,28 @@ import io.netty.handler.logging.LoggingHandler;
 import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.SslContextBuilder;
 import io.netty.handler.ssl.util.SelfSignedCertificate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Netty Server
  * Created by vv on 2016/9/3.
  */
-public class NettyServer{
+public class NettyServer implements ShineServer{
 
+    private static final Logger logger = LoggerFactory.getLogger(NettyServer.class);
     private static final boolean SSL = false;
 
     private EventLoopGroup bossGroup = new NioEventLoopGroup(1);
     private EventLoopGroup workerGroup = new NioEventLoopGroup();
     private ServerBootstrap bootstrap = new ServerBootstrap();
+    private NettyServerHandler nettyServerHandler;
 
-    public void bind(final int port) throws Exception {
+    private Channel serverChannel;
+
+    private void bind(final int port) throws Exception {
+        NettyHelper.setNettyLoggerFactory();
+
         final SslContext sslCtx;
         if (SSL) {
             SelfSignedCertificate ssc = new SelfSignedCertificate();
@@ -51,24 +64,39 @@ public class NettyServer{
                         p.addLast(
                                 new ObjectEncoder(),
                                 new ObjectDecoder(ClassResolvers.cacheDisabled(null)),
-                                new NettyServerHandler());
+                                nettyServerHandler);
                     }
                 });
 
-        bootstrap.bind(port).sync().channel().closeFuture().sync();
+        serverChannel = bootstrap.bind(port).channel();
     }
 
-    private void close(){
+
+    @Override
+    public void setRequestHandler(RequestHandler requestHandler) {
+        nettyServerHandler = new NettyServerHandler(requestHandler);
+    }
+
+    @Override
+    public boolean start() {
+        try {
+            if(nettyServerHandler==null){
+                throw new ShineException("please set requestHandler with NettyServer#setRequestHandler");
+            }
+            bind(ShineConfig.getServicePort());
+        } catch (Exception e) {
+            throw new ShineException(ShineExceptionCode.fail,e);
+        }
+        return true;
+    }
+
+    @Override
+    public boolean stop() {
         bossGroup.shutdownGracefully();
         workerGroup.shutdownGracefully();
-    }
-
-    public static void main(String[] args) {
-        NettyServer server = new NettyServer();
-        try {
-            server.bind(1099);
-        } catch (Exception e) {
-            e.printStackTrace();
+        if(logger.isInfoEnabled()){
+            logger.info("netty server shutdown");
         }
+        return true;
     }
 }

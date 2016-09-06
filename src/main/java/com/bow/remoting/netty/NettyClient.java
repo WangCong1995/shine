@@ -52,7 +52,7 @@ public class NettyClient implements ShineClient {
 
     private EventLoopGroup group = new NioEventLoopGroup();
     private Bootstrap bootstrap;
-    private ChannelFuture channelFuture;
+    private Channel clientChannel;
     private Timer timer;
 
     public NettyClient(){
@@ -62,11 +62,17 @@ public class NettyClient implements ShineClient {
 
     @Override
     public Result call(URL url, Message message) {
+        try {
+            connect(url.getHost(),url.getPort());
+        } catch (Exception e) {
+            throw new ShineException(ShineExceptionCode.fail,e);
+        }
+        sendMessage(message);
         return null;
     }
 
     public void connect(final String host, final int port) throws Exception {
-        //NettyHelper.setNettyLoggerFactory();
+        NettyHelper.setNettyLoggerFactory();
 
         // Configure SSL.
         final SslContext sslCtx;
@@ -76,7 +82,6 @@ public class NettyClient implements ShineClient {
         } else {
             sslCtx = null;
         }
-
 
         bootstrap = new Bootstrap();
         bootstrap.option(ChannelOption.SO_KEEPALIVE,true);
@@ -101,39 +106,59 @@ public class NettyClient implements ShineClient {
     }
 
     private void doConnect(final SocketAddress socketAddress){
-        channelFuture = bootstrap.connect(socketAddress);
-        ChannelFuture closeFuture = channelFuture.channel().closeFuture();
-        //发现其关闭后，不停的尝试重连
-        closeFuture.addListener(new ChannelFutureListener() {
-            @Override
-            public void operationComplete(ChannelFuture future) throws Exception {
-                timer.newTimeout(new TimerTask() {
+
+        ChannelFuture future = bootstrap.connect(socketAddress);
+        try{
+            //等10s还连不上就不连了
+            boolean result = future.awaitUninterruptibly(10000, TimeUnit.MILLISECONDS);
+            if(result && future.isSuccess()){
+                clientChannel = future.channel();
+                ChannelFuture closeFuture = clientChannel.closeFuture();
+                //发现其关闭后，不停的尝试重连
+                closeFuture.addListener(new ChannelFutureListener() {
                     @Override
-                    public void run(Timeout timeout) throws Exception {
-                        logger.warn("retry connect to "+socketAddress.toString());
-                        doConnect(socketAddress);
+                    public void operationComplete(ChannelFuture future) throws Exception {
+                        timer.newTimeout(new TimerTask() {
+                            @Override
+                            public void run(Timeout timeout) throws Exception {
+                                logger.warn("retry connect to "+socketAddress.toString());
+                                doConnect(socketAddress);
+                            }
+                        },RECONNECT_INTERVAL_MILLISECONDS, TimeUnit.MILLISECONDS);
                     }
-                },RECONNECT_INTERVAL_MILLISECONDS, TimeUnit.MILLISECONDS);
+                });
             }
-        });
+        }finally {
+            if(!isActive()){
+                future.cancel(false);
+            }
+        }
     }
 
-    private ChannelFuture sendMessage(Message message){
-        Channel channel = getNettyChannel();
 
-        if(channel==null){
+    public boolean isActive() {
+        if (clientChannel == null)
+            return false;
+        return clientChannel.isActive();
+    }
+
+    private ChannelFuture sendMessage(final Message message){
+
+        if(clientChannel==null){
             throw new ShineException(ShineExceptionCode.connectionException);
         }
-        ChannelFuture future = channel.writeAndFlush(message);
+        ChannelFuture future = clientChannel.writeAndFlush(message);
+        future.addListener(new ChannelFutureListener() {
+            @Override
+            public void operationComplete(ChannelFuture future) throws Exception {
+                if(logger.isDebugEnabled()){
+                    logger.debug("success to send message:"+message);
+                }
+            }
+        });
         return future;
     }
 
-    private Channel getNettyChannel(){
-        if(channelFuture!=null){
-            return channelFuture.channel();
-        }
-        return null;
-    }
 
     private void close(){
         timer.stop();

@@ -19,7 +19,8 @@ public enum ShineExceptionCode {
     /**
      * can not connect the remote url
      */
-    connectionException(102,"connection exception");
+    connectionException(102,"connection exception"),
+    timeoutException(103,"time out exception");
 
     private int code;
     private String message;

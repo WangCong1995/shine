@@ -11,7 +11,6 @@ import java.util.ServiceLoader;
 /**
  * Created by vv on 2016/8/20.
  */
-@Deprecated
 public class ProtocolFactory {
 
     private static Map<String,Protocol> protocolMap = new HashMap<>();

@@ -9,11 +9,12 @@
 
 
     <bean id="defaultCalculator" class="com.bow.demo.DefaultCalculator" />
-    <bean id="hessianRegistryService" class="com.bow.registry.HessianRegistryService" />
     <shine:service  id="calculatorService" interface="com.bow.demo.Calculator" ref="defaultCalculator" />
-    <shine:service  id="calculatorService2" interface="com.bow.demo.Calculator" class="com.bow.demo.DefaultCalccalculatorNameulator">
-        <property name="calculatorName" value="simple-calculator"></property>
-    </shine:service>
+
+    <!--
+    <bean id="hessianRegistryService" class="com.bow.registry.HessianRegistryService" />
     <shine:service  id="registryService" interface="com.bow.registry.RegistryService" ref="hessianRegistryService" />
+    -->
+
 
  </beans>

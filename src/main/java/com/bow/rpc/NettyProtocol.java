@@ -1,23 +1,29 @@
 package com.bow.rpc;
 
 import com.bow.config.ServiceConfig;
+import com.bow.remoting.ShineClient;
+import com.bow.remoting.ShineServer;
+import com.bow.remoting.netty.NettyClient;
+import com.bow.remoting.netty.NettyServer;
 
 /**
- * Created by vv on 2016/8/30.
+ * @author vv
+ * @since 2016/9/6.
  */
-public class NettyProtocol implements Protocol {
-    @Override
-    public boolean export(ServiceConfig serviceConfig) {
-        return false;
-    }
-
-    @Override
-    public Result refer(Message message) {
-        return null;
-    }
+public class NettyProtocol extends AbstractProtocol {
 
     @Override
     public String getName() {
         return "netty";
+    }
+
+    @Override
+    protected ShineServer doInitializeServer() {
+        return new NettyServer();
+    }
+
+    @Override
+    protected ShineClient doInitializeClient() {
+        return new NettyClient();
     }
 }

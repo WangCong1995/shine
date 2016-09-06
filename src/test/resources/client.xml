@@ -7,10 +7,6 @@
  http://bow.com/schema/shine  http://bow.com/schema/shine/shine.xsd
 ">
 
-    <shine:protocol id="netty" name="netty" port="9000" />
-
-    <shine:registry id="zookeeper" name="zookeeper" address="zookeeper://127.0.0.1:2181"/>
-
     <bean id="mockServiceDemo" class="com.bow.demo.FailFastService"></bean>
 	<shine:reference id="c1" interface="com.bow.demo.Calculator"
                      group="vv" version="1.0.0"

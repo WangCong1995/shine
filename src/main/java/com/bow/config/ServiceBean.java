@@ -2,6 +2,7 @@ package com.bow.config;
 
 import com.bow.common.utils.SpringContext;
 import com.bow.rpc.Protocol;
+import com.bow.rpc.ProtocolFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
@@ -29,11 +30,11 @@ public class ServiceBean<T> extends ServiceConfig implements InitializingBean, D
     @Override
     public void onApplicationEvent(ApplicationEvent event) {
         if (ContextRefreshedEvent.class.getName().equals(event.getClass().getName())) {
-            if (logger.isInfoEnabled()) {
-                logger.info("The service ready on spring started. service: " + getInterfaceName());
+            if (logger.isDebugEnabled()) {
+                logger.debug("The service ready on spring started. service: " + getInterfaceName());
             }
             //export
-            Protocol protocol = SpringContext.getBean(Protocol.class);
+            Protocol protocol = ProtocolFactory.getProtocol(ShineConfig.getProtocol());
             protocol.export(this);
         }
     }
