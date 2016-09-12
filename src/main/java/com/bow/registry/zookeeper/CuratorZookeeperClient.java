@@ -15,13 +15,15 @@ import org.apache.zookeeper.WatchedEvent;
 import org.apache.zookeeper.KeeperException.NoNodeException;
 import org.apache.zookeeper.KeeperException.NodeExistsException;
 
-public class CuratorZookeeperClient extends AbstractZookeeperClient<CuratorWatcher> {
+public class CuratorZookeeperClient extends AbstractZookeeperClient {
 
     private final CuratorFramework client;
 
     /**
      * 创建客户端
-     * @param url zookeeper地址
+     * 
+     * @param url
+     *            zookeeper地址
      */
     public CuratorZookeeperClient(URL url) {
         super(url);
@@ -29,6 +31,7 @@ public class CuratorZookeeperClient extends AbstractZookeeperClient<CuratorWatch
                 .retryPolicy(new RetryNTimes(Integer.MAX_VALUE, 1000)).connectionTimeoutMs(5000)
                 .sessionTimeoutMs(60 * 1000);
         client = builder.build();
+        //监控当前连接的状态
         client.getConnectionStateListenable().addListener(new ConnectionStateListener() {
             public void stateChanged(CuratorFramework client, ConnectionState state) {
                 if (state == ConnectionState.LOST) {
@@ -54,6 +57,7 @@ public class CuratorZookeeperClient extends AbstractZookeeperClient<CuratorWatch
 
     /**
      * 短暂的节点
+     * 
      * @param path
      */
     public void createEphemeral(String path) {
@@ -92,11 +96,14 @@ public class CuratorZookeeperClient extends AbstractZookeeperClient<CuratorWatch
         client.close();
     }
 
+    /**
+     * CuratorWatcher是底层的操作，在上层只认识ServiceListener
+     */
     private class CuratorWatcherImpl implements CuratorWatcher {
 
-        private volatile ChildListener listener;
+        private volatile ServiceListener listener;
 
-        public CuratorWatcherImpl(ChildListener listener) {
+        public CuratorWatcherImpl(ServiceListener listener) {
             this.listener = listener;
         }
 
@@ -104,39 +111,16 @@ public class CuratorZookeeperClient extends AbstractZookeeperClient<CuratorWatch
             this.listener = null;
         }
 
-        /**
-         * 当有事件发生就将发生节点路径及其子节点路径传给childChanged()
-         * @param event
-         * @throws Exception
-         */
         public void process(WatchedEvent event) throws Exception {
             if (listener != null) {
-                //在处理事件之前对其下一级子节点绑定监听器
-                listener.childChanged(event.getPath(),
-                        client.getChildren().usingWatcher(this).forPath(event.getPath()));
+                listener.serviceChanged(event.getPath());
             }
         }
     }
 
-    /**
-     * 为path的子节点创建监听器
-     * @param path
-     * @param listener
-     * @return
-     */
-    public CuratorWatcher createTargetChildListener(String path, ChildListener listener) {
-        return new CuratorWatcherImpl(listener);
-    }
-
-    /**
-     * 给path的children 绑定一个监听器
-     * @param path
-     * @param listener
-     * @return
-     */
-    public List<String> addTargetChildListener(String path, CuratorWatcher listener) {
+    public List<String> addListenerToChildren(String path, CuratorWatcher watcher) {
         try {
-            return client.getChildren().usingWatcher(listener).forPath(path);
+            return client.getChildren().usingWatcher(watcher).forPath(path);
         } catch (NoNodeException e) {
             return null;
         } catch (Exception e) {
@@ -144,8 +128,12 @@ public class CuratorZookeeperClient extends AbstractZookeeperClient<CuratorWatch
         }
     }
 
-    public void removeTargetChildListener(String path, CuratorWatcher listener) {
-        ((CuratorWatcherImpl) listener).unwatch();
+    public void removeServiceListener(CuratorWatcher watcher) {
+        ((CuratorWatcherImpl) watcher).unwatch();
+    }
+
+    public CuratorWatcher createServiceListener(ServiceListener listener) {
+        return new CuratorWatcherImpl(listener);
     }
 
 }

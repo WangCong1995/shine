@@ -1,20 +1,17 @@
 package com.bow.rpc;
 
 import com.bow.common.utils.NetUtil;
+import com.bow.common.utils.ShineUtils;
 import com.bow.config.ServiceConfig;
 import com.bow.config.ShineConfig;
 import com.bow.registry.RegistryFactory;
 import com.bow.registry.RegistryService;
-import com.bow.remoting.HessianClient;
-import com.bow.remoting.HessianServer;
 import com.bow.remoting.ShineClient;
-import com.bow.remoting.ShineFuture;
 import com.bow.remoting.ShineServer;
 
 import java.lang.reflect.Method;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 
 /**
  * Protocol template
@@ -22,7 +19,6 @@ import java.util.concurrent.ConcurrentMap;
  * @since 2016/9/3.
  */
 public abstract class AbstractProtocol implements Protocol {
-    protected static final String DEFAULT_SEPARATOR = "#";
 
     private ShineServer server;
 
@@ -39,11 +35,11 @@ public abstract class AbstractProtocol implements Protocol {
     protected RequestHandler requestHandler = new RequestHandler() {
         @Override
         public Result handle(Message message) {
-            String serviceKey = message.getGroup() + DEFAULT_SEPARATOR + message.getInterfaceName();
-            ServiceConfig serviceConfig = exportedMap.get(serviceKey);
+            String serviceName = ShineUtils.getServiceName(message);
+            ServiceConfig serviceConfig = exportedMap.get(serviceName);
             Object proxy = serviceConfig.getRef();
 
-            Result result = new Result();
+            Result result = new Result(message.getId());
             try {
                 Method method = proxy.getClass().getMethod(message.getMethodName(), message.getParameterTypes());
                 Object r = method.invoke(proxy, message.getParameters());
@@ -55,24 +51,9 @@ public abstract class AbstractProtocol implements Protocol {
         }
     };
 
-    /**
-     * client 发送请求后，会调用ShineFuture#get()等待结果返回
-     */
-    private ConcurrentMap<String, ShineFuture> syncFutureMap = new ConcurrentHashMap();
-    /**
-     * 需要此handler记录我之前是用的哪个future进行等待的
-     */
-    protected ResponseHandler responseHandler = new ResponseHandler() {
-        @Override
-        public void handle(Result result) {
-
-        }
-    };
-
-
     @Override
     public boolean export(ServiceConfig serviceConfig) {
-        String serviceKey = serviceConfig.getGroup() + DEFAULT_SEPARATOR + serviceConfig.getInterfaceName();
+        String serviceKey = ShineUtils.getServiceName(serviceConfig);
         exportedMap.put(serviceKey, serviceConfig);
         ensureServerInitialized();
         registry.register(serviceConfig,
@@ -97,6 +78,7 @@ public abstract class AbstractProtocol implements Protocol {
     @Override
     public Result refer(Message message) {
         // 从注册中心拿到服务器地址，发送请求
+        registry.lookup(ShineUtils.getServiceName(message));
         URL serverLocation = new URL("http", "127.0.0.1", 9000, "/");
         ensureClientInitialized();
         return client.call(serverLocation, message);

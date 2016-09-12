@@ -3,6 +3,7 @@ package com.bow.common.utils;
 
 import com.bow.common.exception.ShineException;
 import com.bow.common.exception.ShineExceptionCode;
+import com.bow.rpc.URL;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,7 +17,7 @@ import java.net.UnknownHostException;
  * Created by vv on 2016/8/21.
  */
 public class NetUtil {
-    private static final Logger logger = LoggerFactory.getLogger(NetUtil.class);
+    private final Logger logger = LoggerFactory.getLogger(NetUtil.class);
 
     public static String getLocalHostAddress(){
         String address;
@@ -67,4 +68,5 @@ public class NetUtil {
         sbBuilder.append(socketAddress.getAddress().getHostAddress()).append(":").append(socketAddress.getPort());
         return sbBuilder.toString();
     }
+
 }
