@@ -4,6 +4,8 @@ package com.bow.rpc;
  * Created by vv on 2016/8/20.
  */
 public class Result {
+
+    private long id;
     /**
      * success
      */
@@ -12,6 +14,20 @@ public class Result {
      * exception
      */
     private Throwable cause;
+
+    public Result(){}
+
+    public Result(long id){
+        this.id = id;
+    }
+
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
 
     public Object getValue() {
         return value;

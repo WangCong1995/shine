@@ -1,27 +1,34 @@
 package com.bow.remoting.netty;
 
+import com.bow.rpc.Result;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
- * Created by vv on 2016/9/3.
+ * @author vv
+ * @since 2016/9/3.
  */
 public class NettyClientHandler extends ChannelInboundHandlerAdapter {
 
+    private final Logger logger = LoggerFactory.getLogger(NettyClientHandler.class);
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) {
-        System.out.println("client channelActive");
-        //ctx.writeAndFlush("client send");
+        logger.info("channel is activated, id "+ctx.channel().id());
     }
 
     /**
-     * 接收响应
+     * receive response
      */
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) {
-        System.out.println(msg);
-        //ctx.write(msg);
+        if(msg instanceof Result){
+            Result result = (Result) msg;
+            NettyChannelFuture future = NettyChannelFuture.getFuture(result.getId());
+            future.receive(result);
+        }
     }
 
     @Override
@@ -31,8 +38,7 @@ public class NettyClientHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
-        // Close the connection when an exception is raised.
-        cause.printStackTrace();
+        logger.error("netty channel exception caught",cause);
         ctx.close();
     }
 }

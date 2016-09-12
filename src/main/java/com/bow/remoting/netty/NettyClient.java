@@ -2,9 +2,8 @@ package com.bow.remoting.netty;
 
 import com.bow.common.exception.ShineException;
 import com.bow.common.exception.ShineExceptionCode;
-import com.bow.common.executor.NamedThreadFactory;
-import com.bow.config.ShineConfig;
 import com.bow.remoting.ShineClient;
+import com.bow.remoting.ShineFuture;
 import com.bow.rpc.Message;
 import com.bow.rpc.Result;
 import com.bow.rpc.URL;
@@ -29,20 +28,16 @@ import io.netty.util.HashedWheelTimer;
 import io.netty.util.Timeout;
 import io.netty.util.Timer;
 import io.netty.util.TimerTask;
-import org.jboss.netty.bootstrap.ClientBootstrap;
-import org.jboss.netty.channel.ChannelPipelineFactory;
-import org.jboss.netty.channel.Channels;
-import org.jboss.netty.channel.socket.nio.NioClientSocketChannelFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
-import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Created by vv on 2016/9/1.
+ * @author vv
+ * @since 2016/9/1.
  */
 public class NettyClient implements ShineClient {
 
@@ -67,8 +62,9 @@ public class NettyClient implements ShineClient {
         } catch (Exception e) {
             throw new ShineException(ShineExceptionCode.fail,e);
         }
-        sendMessage(message);
-        return null;
+        ShineFuture<Result> future = sendMessage(message);
+        Result result = future.get(2000,TimeUnit.MILLISECONDS);
+        return result;
     }
 
     public void connect(final String host, final int port) throws Exception {
@@ -142,7 +138,7 @@ public class NettyClient implements ShineClient {
         return clientChannel.isActive();
     }
 
-    private ChannelFuture sendMessage(final Message message){
+    private ShineFuture sendMessage(final Message message){
 
         if(clientChannel==null){
             throw new ShineException(ShineExceptionCode.connectionException);
@@ -156,7 +152,8 @@ public class NettyClient implements ShineClient {
                 }
             }
         });
-        return future;
+        ShineFuture shineFuture = new NettyChannelFuture(message.getId());
+        return shineFuture;
     }
 
 
