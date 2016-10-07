@@ -58,7 +58,7 @@ public class DefaultFuture<V> implements ShineFuture<V>{
                 // 被唤醒后还会再次检查isDone
                 while (!isDone()) {
                     done.await(timeout, unit);
-                    if (isDone() || System.currentTimeMillis() - start > timeout) {
+                    if (isDone() || System.currentTimeMillis() - start >= timeout) {
                         break;
                     }
                 }

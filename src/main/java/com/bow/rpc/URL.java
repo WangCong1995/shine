@@ -8,23 +8,23 @@ import java.util.Map;
  * Created by vv on 2016/8/21.
  */
 public class URL {
-    public URL(){
+    public URL() {
 
     }
 
-    public URL(String host,int port){
-        this(null,host,port,null);
+    public URL(String host, int port) {
+        this(null, host, port, null);
     }
 
-    public URL(String host,int port,String resource){
-        this(null,host,port,resource,null);
+    public URL(String host, int port, String resource) {
+        this(null, host, port, resource, null);
     }
 
-    public URL(String protocol, String host,int port,String resource){
-        this(protocol,host,port,resource,null);
+    public URL(String protocol, String host, int port, String resource) {
+        this(protocol, host, port, resource, null);
     }
 
-    public URL(String protocol,String host,int port,String resource, Map<String,Object> parameters){
+    public URL(String protocol, String host, int port, String resource, Map<String, Object> parameters) {
         this.protocol = protocol;
         this.host = host;
         this.port = port;
@@ -32,22 +32,24 @@ public class URL {
         this.parameters = parameters;
     }
 
-
     /**
      * 服务是通过什么协议公布的
      */
     private String protocol;
+
     private String host;
+
     private int port;
 
     /**
      * 服务接口的全限定名
      */
     private String resource;
+
     /**
      * 服务的附加信息,如所在组名，版本号信息，
      */
-    private Map<String,Object> parameters;
+    private Map<String, Object> parameters;
 
     public String getProtocol() {
         return protocol;
@@ -90,24 +92,28 @@ public class URL {
     }
 
     @Override
-    public String toString(){
+    public String toString() {
         StringBuilder sb = new StringBuilder();
-        if(protocol!=null){
+        if (protocol != null) {
             sb.append(protocol).append("://");
         }
         sb.append(host).append(":").append(port);
-        if(resource!=null){
+        if (resource != null) {
             sb.append("/").append(resource);
         }
-        boolean begin = true;
-        for (Map.Entry<String,Object> parameter:parameters.entrySet()) {
-            sb.append(begin==true?"?":"&");
-            sb.append(parameter.getKey()).append("=").append(JSON.toJSONString(parameter.getValue()));
+
+        if(parameters!=null && parameters.size()!=0){
+            int index = 0;
+            for (Map.Entry<String, Object> parameter : parameters.entrySet()) {
+                sb.append(index == 0 ? "?" : "&");
+                sb.append(parameter.getKey()).append("=").append(JSON.toJSONString(parameter.getValue()));
+                index++;
+            }
         }
         return sb.toString();
     }
 
-    public String getAddress(){
-        return host+":"+port;
+    public String getAddress() {
+        return host + ":" + port;
     }
 }

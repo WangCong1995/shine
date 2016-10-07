@@ -1,5 +1,6 @@
 package com.bow.config;
 
+import com.bow.common.ExtensionLoader;
 import com.bow.common.utils.SpringContext;
 import com.bow.rpc.Protocol;
 import com.bow.rpc.ProtocolFactory;
@@ -20,7 +21,7 @@ import org.springframework.context.event.ContextRefreshedEvent;
  */
 public class ServiceBean<T> extends ServiceConfig implements InitializingBean, DisposableBean, ApplicationListener,ApplicationContextAware {
 
-    private static final Logger logger = LoggerFactory.getLogger(ServiceBean.class);
+    private static Logger logger = LoggerFactory.getLogger(ServiceBean.class);
     @Override
     public void destroy() throws Exception {
         //注销时取消注册
@@ -31,10 +32,10 @@ public class ServiceBean<T> extends ServiceConfig implements InitializingBean, D
     public void onApplicationEvent(ApplicationEvent event) {
         if (ContextRefreshedEvent.class.getName().equals(event.getClass().getName())) {
             if (logger.isDebugEnabled()) {
-                logger.debug("The service ready on spring started. service: " + getInterfaceName());
+                logger.debug("begin to export service: " + getInterfaceName());
             }
             //export
-            Protocol protocol = ProtocolFactory.getProtocol(ShineConfig.getProtocol());
+            Protocol protocol = ExtensionLoader.getExtensionLoader(Protocol.class).getExtension(ShineConfig.getProtocol());
             protocol.export(this);
         }
     }

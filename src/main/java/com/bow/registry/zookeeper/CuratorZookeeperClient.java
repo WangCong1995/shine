@@ -14,6 +14,7 @@ import org.apache.zookeeper.CreateMode;
 import org.apache.zookeeper.WatchedEvent;
 import org.apache.zookeeper.KeeperException.NoNodeException;
 import org.apache.zookeeper.KeeperException.NodeExistsException;
+import org.apache.zookeeper.data.Stat;
 
 public class CuratorZookeeperClient extends AbstractZookeeperClient {
 
@@ -31,7 +32,7 @@ public class CuratorZookeeperClient extends AbstractZookeeperClient {
                 .retryPolicy(new RetryNTimes(Integer.MAX_VALUE, 1000)).connectionTimeoutMs(5000)
                 .sessionTimeoutMs(60 * 1000);
         client = builder.build();
-        //监控当前连接的状态
+        // 监控当前连接的状态
         client.getConnectionStateListenable().addListener(new ConnectionStateListener() {
             public void stateChanged(CuratorFramework client, ConnectionState state) {
                 if (state == ConnectionState.LOST) {
@@ -50,6 +51,7 @@ public class CuratorZookeeperClient extends AbstractZookeeperClient {
         try {
             client.create().forPath(path);
         } catch (NodeExistsException e) {
+            logger.warn(path +" node already exists");
         } catch (Exception e) {
             throw new IllegalStateException(e.getMessage(), e);
         }
@@ -64,9 +66,24 @@ public class CuratorZookeeperClient extends AbstractZookeeperClient {
         try {
             client.create().withMode(CreateMode.EPHEMERAL).forPath(path);
         } catch (NodeExistsException e) {
+            logger.warn(path +"node already exists");
         } catch (Exception e) {
             throw new IllegalStateException(e.getMessage(), e);
         }
+    }
+
+    @Override
+    public boolean exists(String path) {
+        try {
+            return client.checkExists().forPath(path) == null ? false : true;
+        } catch (Exception e) {
+            throw new IllegalStateException(e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public void create(String path, byte[] data) {
+
     }
 
     public void delete(String path) {
@@ -78,6 +95,7 @@ public class CuratorZookeeperClient extends AbstractZookeeperClient {
         }
     }
 
+    @Override
     public List<String> getChildren(String path) {
         try {
             return client.getChildren().forPath(path);
@@ -86,6 +104,28 @@ public class CuratorZookeeperClient extends AbstractZookeeperClient {
         } catch (Exception e) {
             throw new IllegalStateException(e.getMessage(), e);
         }
+    }
+
+    /**
+     * 给path节点绑定一个监听器，其子节点发生变化会触发ChildListener
+     * @param path path
+     * @param listener listener
+     * @return path的子节点
+     */
+    @Override
+    public List<String> addChildListener(String path, ChildListener listener) {
+        CuratorWatcher watcher = new CuratorWatcherImpl(listener);
+        try {
+            //监控path的子节点变化
+            return client.getChildren().usingWatcher(watcher).forPath(path);
+        } catch (Exception e) {
+            throw new IllegalStateException(e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public void removeChildListener(String path, ChildListener listener) {
+
     }
 
     public boolean isConnected() {
@@ -97,13 +137,13 @@ public class CuratorZookeeperClient extends AbstractZookeeperClient {
     }
 
     /**
-     * CuratorWatcher是底层的操作，在上层只认识ServiceListener
+     * 将上层的ChildListener包装为CuratorWatcher
      */
     private class CuratorWatcherImpl implements CuratorWatcher {
 
-        private volatile ServiceListener listener;
+        private volatile ChildListener listener;
 
-        public CuratorWatcherImpl(ServiceListener listener) {
+        public CuratorWatcherImpl(ChildListener listener) {
             this.listener = listener;
         }
 
@@ -113,27 +153,12 @@ public class CuratorZookeeperClient extends AbstractZookeeperClient {
 
         public void process(WatchedEvent event) throws Exception {
             if (listener != null) {
-                listener.serviceChanged(event.getPath());
+                // 1.watcher是一次性的，所以触发后需要重新绑定
+                // 2.client.getChildren().usingWatcher表明监控的是path的子节点是否发生变化
+                List<String> children = client.getChildren().usingWatcher(this).forPath(event.getPath());
+                listener.childChanged(event.getPath(), children);
             }
         }
-    }
-
-    public List<String> addListenerToChildren(String path, CuratorWatcher watcher) {
-        try {
-            return client.getChildren().usingWatcher(watcher).forPath(path);
-        } catch (NoNodeException e) {
-            return null;
-        } catch (Exception e) {
-            throw new IllegalStateException(e.getMessage(), e);
-        }
-    }
-
-    public void removeServiceListener(CuratorWatcher watcher) {
-        ((CuratorWatcherImpl) watcher).unwatch();
-    }
-
-    public CuratorWatcher createServiceListener(ServiceListener listener) {
-        return new CuratorWatcherImpl(listener);
     }
 
 }

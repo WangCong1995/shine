@@ -10,7 +10,7 @@ import java.util.concurrent.atomic.AtomicLong;
  * @author vv
  * @since 2016/8/20.
  */
-public class Message implements Serializable {
+public class Request implements Serializable {
 
     private static final AtomicLong SEQUENCE = new AtomicLong(0);
     private final long id ;
@@ -21,11 +21,16 @@ public class Message implements Serializable {
     private Class<?>[] parameterTypes;
     private Object[] parameters;
 
-    public Message(){
+    /**
+     * 请求的协议，地址
+     */
+    private URL serverUrl;
+
+    public Request(){
         this.id = newId();
     }
 
-    public Message(long id){
+    public Request(long id){
         this.id = id;
     }
 
@@ -86,16 +91,31 @@ public class Message implements Serializable {
         this.group = group;
     }
 
+    public URL getServerUrl() {
+        return serverUrl;
+    }
+
+    public void setServerUrl(URL serverUrl) {
+        this.serverUrl = serverUrl;
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append(group).append("#");
         sb.append(interfaceName).append("#").append(methodName);
         sb.append("(");
+        int index = 0;
         if(parameters!=null){
+
             for(Object param:parameters){
+                if(index!=0){
+                    sb.append(",");
+                }
+                index++;
                 sb.append(JSON.toJSONString(param));
             }
+
         }
         sb.append(")");
         return  sb.toString();

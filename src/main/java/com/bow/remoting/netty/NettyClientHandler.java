@@ -1,6 +1,6 @@
 package com.bow.remoting.netty;
 
-import com.bow.rpc.Result;
+import com.bow.rpc.Response;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import org.slf4j.Logger;
@@ -24,8 +24,8 @@ public class NettyClientHandler extends ChannelInboundHandlerAdapter {
      */
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) {
-        if(msg instanceof Result){
-            Result result = (Result) msg;
+        if(msg instanceof Response){
+            Response result = (Response) msg;
             NettyChannelFuture future = NettyChannelFuture.getFuture(result.getId());
             future.receive(result);
         }

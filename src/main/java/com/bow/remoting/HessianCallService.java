@@ -1,11 +1,11 @@
 package com.bow.remoting;
 
-import com.bow.rpc.Message;
-import com.bow.rpc.Result;
+import com.bow.rpc.Request;
+import com.bow.rpc.Response;
 
 /**
  * Created by vv on 2016/8/21.
  */
 public interface HessianCallService {
-    Result call(Message message);
+    Response call(Request message);
 }

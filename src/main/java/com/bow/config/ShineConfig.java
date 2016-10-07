@@ -17,17 +17,26 @@ public class ShineConfig {
     private String protocol;
     private int servicePort;
     private String registryUrl;
+
+
     /**
      * zookeeper , hessian , redis and so on
      */
     private String registryType;
 
+    private int maxConcurrentRequestLimits;
+
+    private String loadBalance;
+
     private ShineConfig(){
         try{
             protocol = PropertiesUtil.getProperty("protocol");
             servicePort = Integer.parseInt(PropertiesUtil.getProperty("service.port","9000"));
+            maxConcurrentRequestLimits = Integer.parseInt(PropertiesUtil.getProperty("max.concurrent.request.limits","100"));
             registryUrl = PropertiesUtil.getProperty("registry.url");
             registryType = PropertiesUtil.getProperty("registry.type");
+            loadBalance = PropertiesUtil.getProperty("loadBalance");
+
         }catch (Exception e){
             logger.error(ShineExceptionCode.configException.toString(),e);
             throw new ShineException(ShineExceptionCode.configException,e);
@@ -49,5 +58,13 @@ public class ShineConfig {
 
     public static String getRegistryType() {
         return  config.registryType;
+    }
+
+    public static int getMaxConcurrentRequestLimits() {
+        return config.maxConcurrentRequestLimits;
+    }
+
+    public static String getLoadBalance() {
+        return  config.loadBalance;
     }
 }

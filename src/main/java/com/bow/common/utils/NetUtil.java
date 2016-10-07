@@ -41,17 +41,25 @@ public class NetUtil {
         return new InetSocketAddress(split[0], Integer.parseInt(split[1]));
     }
 
+    public static URL toURL(String address) {
+        if (StringUtils.isEmpty(address)) {
+            return null;
+        }
+        String[] split = address.split(":");
+        return new URL(split[0], Integer.parseInt(split[1]));
+    }
+
     /**
      * 将socketAddress转换为127.0.0.1:8080这样的字符串
-     * @param addr
-     * @return
+     * @param address
+     * @return String
      */
-    public static String socketAddress2String(SocketAddress addr) {
-        if (addr == null) {
+    public static String toString(SocketAddress address) {
+        if (address == null) {
             return null;
         }
         StringBuilder sb = new StringBuilder();
-        InetSocketAddress inetSocketAddress = (InetSocketAddress) addr;
+        InetSocketAddress inetSocketAddress = (InetSocketAddress) address;
         sb.append(inetSocketAddress.getAddress().getHostAddress());
         sb.append(":");
         sb.append(inetSocketAddress.getPort());

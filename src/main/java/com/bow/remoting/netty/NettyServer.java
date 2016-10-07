@@ -7,6 +7,8 @@ import com.bow.remoting.ShineServer;
 import com.bow.rpc.RequestHandler;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.Channel;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.EventLoopGroup;
@@ -21,6 +23,8 @@ import io.netty.handler.logging.LoggingHandler;
 import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.SslContextBuilder;
 import io.netty.handler.ssl.util.SelfSignedCertificate;
+import io.netty.util.concurrent.Future;
+import io.netty.util.concurrent.GenericFutureListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -68,7 +72,21 @@ public class NettyServer implements ShineServer{
                     }
                 });
 
-        serverChannel = bootstrap.bind(port).channel();
+        ChannelFuture future = bootstrap.bind(port);
+        future.addListener(new ChannelFutureListener() {
+            @Override
+            public void operationComplete(ChannelFuture future) throws Exception {
+                logger.info("----- success to start server -----");
+            }
+        });
+        serverChannel = future.channel();
+        ChannelFuture closeFuture = serverChannel.closeFuture();
+        closeFuture.addListener(new ChannelFutureListener(){
+            @Override
+            public void operationComplete(ChannelFuture future) throws Exception {
+                logger.info("already close netty server channel");
+            }
+        });
     }
 
 

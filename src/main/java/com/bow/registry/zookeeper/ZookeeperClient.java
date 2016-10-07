@@ -4,42 +4,73 @@ import com.bow.rpc.URL;
 
 import java.util.List;
 
-
 public interface ZookeeperClient {
 
-	/**
-	 * create a node
-	 * @param path path
-	 * @param ephemeral ephemeral
+    /**
+     * create a node /a/b/c 只有当/a/b存在时，才可以创建c
+     * 
+     * @param path
+     *            path
+     * @param ephemeral
+     *            ephemeral
      */
-	void create(String path, boolean ephemeral);
+    void create(String path, boolean ephemeral);
 
-	/**
-	 * delete a node
-	 * @param path path
+    /**
+     * /a/b/c 当/a/b不存在时也能够创建
+     * 
+     * @param path
+     *            /a/b/c
+     * @param ephemeral
+     *            临时节点，连接断开后session失效节点即删除
      */
-	void delete(String path);
+    void forceCreate(String path, boolean ephemeral);
 
-	List<String> getChildren(String path);
+    boolean exists(String path);
 
-	/**
-	 * bind listener to path
-	 * @param path path
-	 * @param listener listener
-     * @return List<String>
+    /**
+     *
+     * @param path
+     *            node
+     * @param data
+     *            data
      */
-	List<String> addServiceListener(String path, ServiceListener listener);
+    void create(String path, byte[] data);
 
-	void removeServiceListener(String path, ServiceListener listener);
+    /**
+     * delete a node
+     * 
+     * @param path
+     *            path
+     */
+    void delete(String path);
 
-	void addStateListener(StateListener listener);
-	
-	void removeStateListener(StateListener listener);
+    List<String> getChildren(String path);
 
-	boolean isConnected();
+    /**
+     * 给path节点绑定一个监听器，其子节点发生变化会触发ChildListener
+     * 
+     * @param path
+     *            path
+     * @param listener
+     *            listener
+     * @return path的子节点
+     */
+    List<String> addChildListener(String path, ChildListener listener);
 
-	void close();
+    void removeChildListener(String path, ChildListener listener);
 
-	URL getUrl();
+    void addStateListener(StateListener listener);
+
+    void removeStateListener(StateListener listener);
+
+    boolean isConnected();
+
+    void close();
+
+    /**
+     * @return zookeeper url client connect
+     */
+    URL getUrl();
 
 }

@@ -5,5 +5,5 @@ package com.bow.rpc;
  * @since 2016/9/7.
  */
 public interface ResponseHandler {
-    void handle(Result result);
+    void handle(Response result);
 }

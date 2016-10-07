@@ -1,9 +1,9 @@
 package com.bow.common.utils;
 
-import org.eclipse.jetty.util.ConcurrentHashSet;
 import org.springframework.beans.factory.BeanFactoryUtils;
 import org.springframework.context.ApplicationContext;
 
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -11,7 +11,7 @@ import java.util.Set;
  * @since 2016/9/4.
  */
 public class SpringContext {
-    private static final Set<ApplicationContext> contexts = new ConcurrentHashSet<ApplicationContext>();
+    private static final Set<ApplicationContext> contexts = new HashSet<ApplicationContext>();
 
     public static void addApplicationContext(ApplicationContext context) {
         contexts.add(context);

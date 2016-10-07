@@ -10,9 +10,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.CopyOnWriteArraySet;
 
-/**
- * TODO 该层是一个中间层，他的子层是curator底层操作zookeeper，serviceListeners有必要缓存着吗？
- */
 public abstract class AbstractZookeeperClient implements ZookeeperClient {
 
     protected static final Logger logger = LoggerFactory.getLogger(AbstractZookeeperClient.class);
@@ -20,8 +17,6 @@ public abstract class AbstractZookeeperClient implements ZookeeperClient {
     private final URL url;
 
     private final Set<StateListener> stateListeners = new CopyOnWriteArraySet<StateListener>();
-
-    private final ConcurrentMap<String, ServiceListener> serviceListeners = new ConcurrentHashMap<String, ServiceListener>();
 
     private volatile boolean closed = false;
 
@@ -36,6 +31,15 @@ public abstract class AbstractZookeeperClient implements ZookeeperClient {
 
     @Override
     public void create(String path, boolean ephemeral) {
+        if (ephemeral) {
+            createEphemeral(path);
+        } else {
+            createPersistent(path);
+        }
+    }
+
+    @Override
+    public void forceCreate(String path, boolean ephemeral) {
         int i = path.lastIndexOf('/');
         if (i > 0) {
             create(path.substring(0, i), false);
@@ -59,15 +63,6 @@ public abstract class AbstractZookeeperClient implements ZookeeperClient {
 
     public Set<StateListener> getSessionListeners() {
         return stateListeners;
-    }
-
-    @Override
-    public List<String> addServiceListener(String path, ServiceListener listener) {
-        return null;
-    }
-
-    @Override
-    public void removeServiceListener(String path, ServiceListener listener) {
     }
 
 

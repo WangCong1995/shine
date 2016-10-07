@@ -33,6 +33,11 @@ public class HessianRegistryService implements RegistryService {
     }
 
     @Override
+    public void subscribe(String serviceName) {
+
+    }
+
+    @Override
     public String getName() {
         return "hessian";
     }

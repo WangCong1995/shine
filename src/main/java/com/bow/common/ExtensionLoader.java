@@ -1,0 +1,105 @@
+package com.bow.common;
+
+import com.bow.common.exception.ShineException;
+import com.bow.common.exception.ShineExceptionCode;
+import com.bow.config.Name;
+import com.bow.config.Named;
+import com.bow.config.SPI;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.lang.annotation.Annotation;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.ServiceLoader;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+
+/**
+ * Protocol 等接口，可以通过此工具直接获取到其实现类的实例,通过注解@SPI来指定其默认的实现类 如@SPI("类名")<br/>
+ * 每个ExtensionLoader对应接口type 和所有该接口的实现的实例instances
+ *
+ * @author vv
+ * @since 2016/10/2.
+ */
+public class ExtensionLoader<T> {
+
+    private static Logger logger = LoggerFactory.getLogger(ExtensionLoader.class);
+
+    private static ConcurrentMap<Class<?>, ExtensionLoader<?>> extensionLoaders = new ConcurrentHashMap<Class<?>, ExtensionLoader<?>>();
+
+    /**
+     * 接口名
+     */
+    private Class<T> type;
+
+    /**
+     * 各种实现的实例
+     */
+    private Map<String, T> instances = new HashMap<String, T>();
+
+    private ExtensionLoader(Class<T> type) {
+        this.type = type;
+        ServiceLoader serviceLoader = ServiceLoader.load(type);
+        Iterator<T> it = serviceLoader.iterator();
+        while (it.hasNext()) {
+            T service = it.next();
+            // service 有名字，就用其名字存储，否则用其类名存储
+            if (service instanceof Named) {
+                instances.put(((Named) service).getName(), service);
+            } else if (service.getClass().isAnnotationPresent(Name.class)) {
+                Name nameAnnotation = service.getClass().getAnnotation(Name.class);
+                String name = nameAnnotation.value();
+                instances.put(name, service);
+            } else {
+                instances.put(service.getClass().getSimpleName(), service);
+            }
+        }
+    }
+
+    public static <T> ExtensionLoader<T> getExtensionLoader(Class<T> type) {
+        ExtensionLoader<T> loader = (ExtensionLoader<T>) extensionLoaders.get(type);
+        if (loader == null) {
+            loader = createExtensionLoader(type);
+        }
+        return loader;
+    }
+
+    private static synchronized <T> ExtensionLoader<T> createExtensionLoader(Class<T> type) {
+        ExtensionLoader<T> loader = (ExtensionLoader<T>) extensionLoaders.get(type);
+        if (loader == null) {
+            loader = new ExtensionLoader<T>(type);
+            extensionLoaders.putIfAbsent(type, loader);
+            loader = (ExtensionLoader<T>) extensionLoaders.get(type);
+        }
+        return loader;
+    }
+
+    public T getExtension() {
+        return getExtension(null);
+    }
+
+    public T getExtension(String name) {
+        if (StringUtils.isEmpty(name) && type.isAnnotationPresent(SPI.class)) {
+            SPI spi = type.getAnnotation(SPI.class);
+            name = spi.value();
+        }
+        if (StringUtils.isEmpty(name)) {
+            throw new ShineException(ShineExceptionCode.configException,
+                    "must specify a implements for type " + type.getName());
+        }
+        // 忽略大小写
+        for (String key : instances.keySet()) {
+            if (name.equalsIgnoreCase(key)) {
+                name = key;
+            }
+        }
+        T result = instances.get(name);
+        if (result == null) {
+            logger.warn("get nothing for type " + type.getName() + " name " + name);
+        }
+        return result;
+    }
+}

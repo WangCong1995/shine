@@ -1,13 +1,9 @@
 package com.bow.remoting;
 
-import com.bow.rpc.Message;
+import com.bow.rpc.Request;
 import com.bow.rpc.RequestHandler;
-import com.bow.rpc.Result;
+import com.bow.rpc.Response;
 import com.caucho.hessian.server.HessianServlet;
-
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 /**
  * Created by vv on 2016/8/20.
@@ -17,7 +13,7 @@ public class HessianDispatcherServlet extends HessianServlet implements HessianC
     private RequestHandler requestHandler;
 
     @Override
-    public Result call(Message message) {
+    public Response call(Request message) {
         return requestHandler.handle(message);
     }
 

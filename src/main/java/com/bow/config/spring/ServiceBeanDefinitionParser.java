@@ -3,6 +3,7 @@ package com.bow.config.spring;
 import com.bow.common.exception.ShineException;
 import com.bow.common.exception.ShineExceptionCode;
 import com.bow.config.ServiceBean;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanDefinitionHolder;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
@@ -39,7 +40,7 @@ public class ServiceBeanDefinitionParser implements BeanDefinitionParser {
 
         try {
             //init service instance
-            if(refId!=null && refId.length()>0){
+            if(StringUtils.isNotEmpty(refId)){
                 RuntimeBeanReference ref = new RuntimeBeanReference(refId);
                 beanDefinition.getPropertyValues().addPropertyValue("ref", ref);
             }else if(className != null && className.length() > 0){

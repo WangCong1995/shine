@@ -1,50 +1,58 @@
 package com.bow.rpc;
 
+import com.bow.common.ExtensionLoader;
+import com.bow.common.exception.ShineException;
+import com.bow.common.exception.ShineExceptionCode;
 import com.bow.common.utils.NetUtil;
 import com.bow.common.utils.ShineUtils;
 import com.bow.config.ServiceConfig;
 import com.bow.config.ShineConfig;
-import com.bow.registry.RegistryFactory;
 import com.bow.registry.RegistryService;
 import com.bow.remoting.ShineClient;
 import com.bow.remoting.ShineServer;
 
 import java.lang.reflect.Method;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Protocol template
+ * 
  * @author vv
  * @since 2016/9/3.
  */
 public abstract class AbstractProtocol implements Protocol {
 
-    private ShineServer server;
-
-    private ShineClient client;
+    private Map<String,ShineClient> clients = new HashMap<String,ShineClient>();
 
     private RegistryService registry;
 
-    protected Map<String, ServiceConfig> exportedMap = new ConcurrentHashMap<>();
+    private ShineServer server;
 
-    public AbstractProtocol(){
+    /**
+     * 所有被暴露的服务
+     */
+    protected Map<String, ServiceConfig> exportedMap = new ConcurrentHashMap<String, ServiceConfig>();
+
+    public AbstractProtocol() {
         initRegistryService();
     }
 
     protected RequestHandler requestHandler = new RequestHandler() {
         @Override
-        public Result handle(Message message) {
+        public Response handle(Request message) {
             String serviceName = ShineUtils.getServiceName(message);
             ServiceConfig serviceConfig = exportedMap.get(serviceName);
             Object proxy = serviceConfig.getRef();
 
-            Result result = new Result(message.getId());
+            Response result = new Response(message.getId());
             try {
                 Method method = proxy.getClass().getMethod(message.getMethodName(), message.getParameterTypes());
                 Object r = method.invoke(proxy, message.getParameters());
                 result.setValue(r);
-            } catch (Exception e) {
+            } catch (Throwable e) {
                 result.setCause(e);
             }
             return result;
@@ -53,16 +61,16 @@ public abstract class AbstractProtocol implements Protocol {
 
     @Override
     public boolean export(ServiceConfig serviceConfig) {
-        String serviceKey = ShineUtils.getServiceName(serviceConfig);
-        exportedMap.put(serviceKey, serviceConfig);
+        String serviceName = ShineUtils.getServiceName(serviceConfig);
+        exportedMap.put(serviceName, serviceConfig);
         ensureServerInitialized();
-        registry.register(serviceConfig,
-                new URL(NetUtil.getLocalHostAddress(), ShineConfig.getServicePort()));
+        // 注册
+        registry.register(serviceConfig, new URL(NetUtil.getLocalHostAddress(), ShineConfig.getServicePort()));
 
         return true;
     }
 
-    private void ensureServerInitialized(){
+    private void ensureServerInitialized() {
         if (server == null) {
             server = doInitializeServer();
             server.setRequestHandler(requestHandler);
@@ -72,32 +80,39 @@ public abstract class AbstractProtocol implements Protocol {
 
     /**
      * client send message to remote server with rpc;
-     * @param message method name , parameters
-     * @return Result server response
+     * 
+     * @param request
+     *            method name , parameters
+     * @return Result,server response
      */
     @Override
-    public Result refer(Message message) {
-        // 从注册中心拿到服务器地址，发送请求
-        registry.lookup(ShineUtils.getServiceName(message));
-        URL serverLocation = new URL("http", "127.0.0.1", 9000, "/");
-        ensureClientInitialized();
-        return client.call(serverLocation, message);
+    public Response refer(Request request) {
+        URL serverLocation = request.getServerUrl();
+        if (serverLocation == null) {
+            throw new ShineException(ShineExceptionCode.noExistsService,request.toString());
+        }
+        ShineClient client = getClient(serverLocation);
+        return client.call(request);
     }
 
-    private void ensureClientInitialized(){
-        if (client == null) {
-            client = doInitializeClient();
+    private ShineClient getClient(URL serverLocation) {
+        String address = serverLocation.getAddress()+":"+serverLocation.getPort();
+        synchronized (this){
+            if (clients.get(address) == null) {
+                ShineClient client = doInitializeClient(serverLocation);
+                clients.put(address,client);
+            }
+            return clients.get(address);
         }
     }
 
-
-
     protected abstract ShineServer doInitializeServer();
-    protected abstract ShineClient doInitializeClient();
 
-    private void initRegistryService(){
-        registry = RegistryFactory.getRegistryService(ShineConfig.getRegistryType());
+    protected abstract ShineClient doInitializeClient(URL serverLocation);
+
+    private void initRegistryService() {
+        registry = ExtensionLoader.getExtensionLoader(RegistryService.class)
+                .getExtension(ShineConfig.getRegistryType());
     }
-
 
 }

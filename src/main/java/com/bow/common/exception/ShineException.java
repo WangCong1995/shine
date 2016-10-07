@@ -13,6 +13,10 @@ public class ShineException extends RuntimeException {
         this(code.toString());
     }
 
+    public ShineException(ShineExceptionCode code,String detailMessage){
+        this(code.toString()+"--"+detailMessage);
+    }
+
     public ShineException(ShineExceptionCode code,Throwable e){
         this(code.toString(),e);
     }

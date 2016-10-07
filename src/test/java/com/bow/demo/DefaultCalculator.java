@@ -8,7 +8,7 @@ public class DefaultCalculator implements Calculator {
     private String calculatorName;
 
     @Override
-    public int calculate(int a, int b) {
+    public Integer calculate(Integer a, Integer b) {
         return (a+b)*2;
     }
 

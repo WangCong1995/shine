@@ -24,8 +24,8 @@ public class HessianProtocol extends AbstractProtocol {
     }
 
     @Override
-    protected ShineClient doInitializeClient() {
-        return new HessianClient();
+    protected ShineClient doInitializeClient(URL serverLocation) {
+        return new HessianClient(serverLocation);
     }
 
 }

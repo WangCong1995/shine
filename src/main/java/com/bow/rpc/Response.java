@@ -1,9 +1,11 @@
 package com.bow.rpc;
 
+import java.io.Serializable;
+
 /**
  * Created by vv on 2016/8/20.
  */
-public class Result {
+public class Response implements Serializable {
 
     private long id;
     /**
@@ -15,9 +17,9 @@ public class Result {
      */
     private Throwable cause;
 
-    public Result(){}
+    public Response(){}
 
-    public Result(long id){
+    public Response(long id){
         this.id = id;
     }
 

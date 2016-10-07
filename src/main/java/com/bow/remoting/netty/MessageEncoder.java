@@ -1,6 +1,6 @@
 package com.bow.remoting.netty;
 
-import com.bow.rpc.Message;
+import com.bow.rpc.Request;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToMessageEncoder;
@@ -22,7 +22,7 @@ public class MessageEncoder extends MessageToMessageEncoder {
 
     @Override
     protected void encode(ChannelHandlerContext ctx, Object msg, List out) throws Exception {
-        if(msg instanceof Message) {
+        if(msg instanceof Request) {
             ByteArrayOutputStream bos = new ByteArrayOutputStream();
 
             try {

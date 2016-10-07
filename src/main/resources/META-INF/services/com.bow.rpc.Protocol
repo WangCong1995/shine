@@ -1,1 +1,2 @@
 com.bow.rpc.HessianProtocol
+com.bow.rpc.NettyProtocol

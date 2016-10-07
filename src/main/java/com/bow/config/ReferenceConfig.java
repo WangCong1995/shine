@@ -1,5 +1,6 @@
 package com.bow.config;
 
+import com.bow.rpc.URL;
 
 /**
  * Created by vv on 2016/8/19.
@@ -7,13 +8,21 @@ package com.bow.config;
 public class ReferenceConfig {
 
     private String id;
+
     private String interfaceName;
+
     private Class<?> interfaceClass;
-    private String group;
+
+    private String group = "default";
 
     private String version;
 
     private Object mockServiceRef;
+
+    /**
+     * 直连地址
+     */
+    private URL directUrl;
 
     public Object getMockServiceRef() {
         return mockServiceRef;
@@ -61,5 +70,13 @@ public class ReferenceConfig {
 
     public void setGroup(String group) {
         this.group = group;
+    }
+
+    public URL getDirectUrl() {
+        return directUrl;
+    }
+
+    public void setDirectUrl(URL directUrl) {
+        this.directUrl = directUrl;
     }
 }

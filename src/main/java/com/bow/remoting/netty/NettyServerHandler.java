@@ -1,7 +1,9 @@
 package com.bow.remoting.netty;
 
-import com.bow.rpc.Message;
+import com.bow.rpc.Request;
 import com.bow.rpc.RequestHandler;
+import com.bow.rpc.Response;
+import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import org.slf4j.Logger;
@@ -10,6 +12,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Created by vv on 2016/9/3.
  */
+@ChannelHandler.Sharable
 public class NettyServerHandler extends ChannelInboundHandlerAdapter {
 
     private RequestHandler requestHandler;
@@ -30,11 +33,16 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter {
      */
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) {
-        Message message = (Message) msg;
-        if(logger.isInfoEnabled()){
-            logger.info("received message:"+message);
+
+        if(msg instanceof  Request){
+            Request request = (Request) msg;
+            if(logger.isDebugEnabled()){
+                logger.debug("received request:"+request);
+            }
+            Response response = requestHandler.handle(request);
+            ctx.write(response);
         }
-        ctx.write(requestHandler.handle(message));
+
     }
 
     @Override

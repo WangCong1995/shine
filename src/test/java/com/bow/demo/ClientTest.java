@@ -18,8 +18,10 @@ public class ClientTest {
     }
 
     @Test
-    public void test1(){
+    public void refer(){
         ApplicationContext context = new ClassPathXmlApplicationContext("client.xml");
         Calculator calculator = context.getBean("c1",Calculator.class);
+        int result = calculator.calculate(1,1);
+        System.out.println("result>>> "+result);
     }
 }

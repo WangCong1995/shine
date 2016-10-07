@@ -3,6 +3,7 @@ package com.bow.config.spring;
 import com.bow.common.exception.ShineException;
 import com.bow.common.exception.ShineExceptionCode;
 import com.bow.config.ReferenceBean;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.beans.factory.support.RootBeanDefinition;
@@ -24,10 +25,14 @@ public class ReferenceBeanDefinitionParser implements BeanDefinitionParser {
         beanDefinition.getPropertyValues().addPropertyValue("id", id);
 
         String group = element.getAttribute("group");
-        beanDefinition.getPropertyValues().addPropertyValue("group", group);
+        if(StringUtils.isNotEmpty(group)){
+            beanDefinition.getPropertyValues().addPropertyValue("group", group);
+        }
 
         String version = element.getAttribute("version");
-        beanDefinition.getPropertyValues().addPropertyValue("version", version);
+        if(StringUtils.isNotEmpty(version)){
+            beanDefinition.getPropertyValues().addPropertyValue("version", version);
+        }
 
         String interfaceName = element.getAttribute("interface");
         beanDefinition.getPropertyValues().addPropertyValue("interfaceName", interfaceName);
@@ -37,8 +42,10 @@ public class ReferenceBeanDefinitionParser implements BeanDefinitionParser {
             throw new ShineException(ShineExceptionCode.configException,e);
         }
         String refId = element.getAttribute("mockServiceRef");
-        RuntimeBeanReference ref = new RuntimeBeanReference(refId);
-        beanDefinition.getPropertyValues().addPropertyValue("mockServiceRef", ref);
+        if(StringUtils.isNotEmpty(refId)){
+            RuntimeBeanReference ref = new RuntimeBeanReference(refId);
+            beanDefinition.getPropertyValues().addPropertyValue("mockServiceRef", ref);
+        }
 
         parserContext.getRegistry().registerBeanDefinition(id, beanDefinition);
         beanDefinition.setLazyInit(false);
