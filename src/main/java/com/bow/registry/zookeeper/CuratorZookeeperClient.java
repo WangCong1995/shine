@@ -30,7 +30,7 @@ public class CuratorZookeeperClient extends AbstractZookeeperClient {
         super(url);
         Builder builder = CuratorFrameworkFactory.builder().connectString(url.getAddress())
                 .retryPolicy(new RetryNTimes(Integer.MAX_VALUE, 1000)).connectionTimeoutMs(5000)
-                .sessionTimeoutMs(60 * 1000);
+                .sessionTimeoutMs(15000);
         client = builder.build();
         // 监控当前连接的状态
         client.getConnectionStateListenable().addListener(new ConnectionStateListener() {
@@ -82,8 +82,26 @@ public class CuratorZookeeperClient extends AbstractZookeeperClient {
     }
 
     @Override
-    public void create(String path, byte[] data) {
+    public void create(String path,boolean ephemeral, byte[] data) {
+        try {
+            if(ephemeral){
+                client.create().withMode(CreateMode.EPHEMERAL).forPath(path,data);
+            }else{
+                client.create().withMode(CreateMode.PERSISTENT).forPath(path,data);
+            }
 
+        } catch (Exception e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
+    @Override
+    public byte[] getData(String path){
+        try {
+            return client.getData().forPath(path);
+        } catch (Exception e) {
+            throw new IllegalStateException(e);
+        }
     }
 
     public void delete(String path) {

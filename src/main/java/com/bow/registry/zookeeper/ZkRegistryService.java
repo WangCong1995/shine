@@ -1,10 +1,12 @@
 package com.bow.registry.zookeeper;
 
+import com.bow.common.Version;
 import com.bow.common.utils.NetUtil;
 import com.bow.common.utils.ShineUtils;
 import com.bow.config.ServiceConfig;
 import com.bow.config.ShineConfig;
 import com.bow.registry.RegistryService;
+import com.bow.rpc.Request;
 import com.bow.rpc.URL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,7 +32,7 @@ public class ZkRegistryService implements RegistryService {
     /**
      * key:service所在的全路径
      */
-    private Map<String, List<URL>> subscribed = new ConcurrentHashMap<String, List<URL>>();
+    private Map<String, List<String>> subscribed = new ConcurrentHashMap<String, List<String>>();
 
     public ZkRegistryService() {
         InetSocketAddress address = NetUtil.toSocketAddress(ShineConfig.getRegistryUrl());
@@ -44,15 +46,29 @@ public class ZkRegistryService implements RegistryService {
 
     /**
      * 客户端调用
-     * 
-     * @param serviceName
-     *            组名#接口全限定名#版本号 如 vv#com.bow.shine.IHello#0.1.1
+     *
+     *
+     * 注意：版本号1.2 能够匹配到1.2.1
+     *
      * @return
      */
     @Override
-    public List<URL> lookup(String serviceName) {
-        String nodePath = root + ShineUtils.SLASH + serviceName;
-        return subscribed.get(nodePath);
+    public List<URL> lookup(Request request) {
+        String nodePath = root + ShineUtils.SLASH + ShineUtils.getServiceName(request);
+        List<String> urlStrs = subscribed.get(nodePath);
+        Version requestVersion = new Version(request.getVersion());
+        List<URL> result = new ArrayList<>();
+        for(String urlStr:urlStrs){
+            String v = new String(zookeeperClient.getData(nodePath+ShineUtils.SLASH +urlStr));
+            Version v1 = new Version(v);
+
+            if(requestVersion.imply(v1)){
+                URL url = NetUtil.toURL(urlStr);
+                url.setParameter("version",v);
+                result.add(url);
+            }
+        }
+        return result;
     }
 
     @Override
@@ -63,7 +79,9 @@ public class ZkRegistryService implements RegistryService {
         }
         // url 是短暂节点
         nodePath += ShineUtils.SLASH + providerUrl.getAddress();
-        zookeeperClient.create(nodePath, true);
+        //版本号放到url节点的数据区里
+        byte[] data = serviceConfig.getVersion()==null?null:serviceConfig.getVersion().getBytes();
+        zookeeperClient.create(nodePath, true,data);
         return true;
     }
 
@@ -81,24 +99,15 @@ public class ZkRegistryService implements RegistryService {
              */
             @Override
             public void childChanged(String path, List<String> children) {
-                List<URL> urls = new ArrayList<>();
-                if (children != null) {
-                    for (String urlStr : children) {
-                        urls.add(NetUtil.toURL(urlStr));
-                    }
-                }
-                subscribed.put(path, urls);
+                subscribed.put(path, children);
+                //FIXME 当children.size=0,触发删除path
             }
         };
         // 给root添加监听的时候，会获得root下的子节点
         String servicePath = root + ShineUtils.SLASH + serviceName;
         List<String> children = zookeeperClient.addChildListener(servicePath, childListener);
-        List<URL> urls = new ArrayList<>();
         if (children != null) {
-            for (String urlStr : children) {
-                urls.add(NetUtil.toURL(urlStr));
-            }
-            subscribed.put(servicePath, urls);
+            subscribed.put(servicePath, children);
         } else {
             logger.warn("no url for service: " + servicePath);
         }

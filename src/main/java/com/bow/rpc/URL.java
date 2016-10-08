@@ -2,12 +2,14 @@ package com.bow.rpc;
 
 import com.alibaba.fastjson.JSON;
 
+import java.io.Serializable;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
  * Created by vv on 2016/8/21.
  */
-public class URL {
+public class URL implements Serializable{
     public URL() {
 
     }
@@ -17,19 +19,14 @@ public class URL {
     }
 
     public URL(String host, int port, String resource) {
-        this(null, host, port, resource, null);
+        this(null, host, port, resource);
     }
 
     public URL(String protocol, String host, int port, String resource) {
-        this(protocol, host, port, resource, null);
-    }
-
-    public URL(String protocol, String host, int port, String resource, Map<String, Object> parameters) {
         this.protocol = protocol;
         this.host = host;
         this.port = port;
         this.resource = resource;
-        this.parameters = parameters;
     }
 
     /**
@@ -49,7 +46,7 @@ public class URL {
     /**
      * 服务的附加信息,如所在组名，版本号信息，
      */
-    private Map<String, Object> parameters;
+    private Map<String, Object> parameters = new HashMap<String,Object>();
 
     public String getProtocol() {
         return protocol;
@@ -81,6 +78,14 @@ public class URL {
 
     public void setParameters(Map<String, Object> parameters) {
         this.parameters = parameters;
+    }
+
+    public void setParameter(String key,Object value){
+        this.parameters.put(key,value);
+    }
+
+    public Object getParameter(String key){
+        return this.parameters.get(key);
     }
 
     public String getResource() {

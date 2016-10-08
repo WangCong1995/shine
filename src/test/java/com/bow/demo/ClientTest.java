@@ -10,18 +10,11 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 public class ClientTest {
 
     @Test
-    public void testAll(){
-        ApplicationContext context = new ClassPathXmlApplicationContext("client.xml");
-        Calculator calculator = context.getBean("c1",Calculator.class);
-        int result = calculator.calculate(1,3);
-        System.out.println(result);
-    }
-
-    @Test
     public void refer(){
         ApplicationContext context = new ClassPathXmlApplicationContext("client.xml");
         Calculator calculator = context.getBean("c1",Calculator.class);
         int result = calculator.calculate(1,1);
         System.out.println("result>>> "+result);
     }
+
 }

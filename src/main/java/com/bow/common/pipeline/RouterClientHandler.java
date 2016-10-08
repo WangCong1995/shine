@@ -35,7 +35,7 @@ public class RouterClientHandler extends ShineHandlerAdapter{
             context.nextSendRequest(message);
             return;
         }
-        List<URL> urls = registry.lookup(serviceName);
+        List<URL> urls = registry.lookup(request);
         URL url= loadBalance.select(serviceName,urls);
         request.setServerUrl(url);
         context.nextSendRequest(message);

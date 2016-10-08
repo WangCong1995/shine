@@ -26,10 +26,6 @@ public class ShineUtils {
         sb.append(request.getGroup());
         sb.append(HASH_KEY);
         sb.append(request.getInterfaceName());
-        if(request.getVersion()!=null){
-            sb.append(HASH_KEY);
-            sb.append(request.getVersion());
-        }
         return sb.toString();
     }
 
@@ -38,10 +34,6 @@ public class ShineUtils {
         sb.append(serviceConfig.getGroup());
         sb.append(HASH_KEY);
         sb.append(serviceConfig.getInterfaceName());
-        if(serviceConfig.getVersion()!=null){
-            sb.append(HASH_KEY);
-            sb.append(serviceConfig.getVersion());
-        }
         return sb.toString();
     }
 
@@ -50,10 +42,6 @@ public class ShineUtils {
         sb.append(referenceConfig.getGroup());
         sb.append(HASH_KEY);
         sb.append(referenceConfig.getInterfaceName());
-        if(referenceConfig.getVersion()!=null){
-            sb.append(HASH_KEY);
-            sb.append(referenceConfig.getVersion());
-        }
         return sb.toString();
     }
 

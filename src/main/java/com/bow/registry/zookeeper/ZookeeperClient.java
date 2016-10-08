@@ -17,6 +17,15 @@ public interface ZookeeperClient {
     void create(String path, boolean ephemeral);
 
     /**
+     *
+     * @param path
+     *            node
+     * @param data
+     *            data
+     */
+    void create(String path,boolean ephemeral, byte[] data);
+
+    /**
      * /a/b/c 当/a/b不存在时也能够创建
      * 
      * @param path
@@ -26,16 +35,11 @@ public interface ZookeeperClient {
      */
     void forceCreate(String path, boolean ephemeral);
 
+    byte[] getData(String path);
+
     boolean exists(String path);
 
-    /**
-     *
-     * @param path
-     *            node
-     * @param data
-     *            data
-     */
-    void create(String path, byte[] data);
+
 
     /**
      * delete a node

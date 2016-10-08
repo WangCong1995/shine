@@ -59,6 +59,7 @@ public class ReferenceBean extends ReferenceConfig
     private Request buildRequest(MethodInvocation invocation) {
         Request request = new Request();
         request.setGroup(getGroup());
+        request.setVersion(getVersion());
         request.setInterfaceName(getInterfaceName());
         Method method = invocation.getMethod();
         request.setMethodName(method.getName());
@@ -98,7 +99,7 @@ public class ReferenceBean extends ReferenceConfig
         RegistryService registryService = ExtensionLoader.getExtensionLoader(RegistryService.class).getExtension(ShineConfig.getRegistryType());
         String serviceName = ShineUtils.getServiceName(this);
         registryService.subscribe(serviceName);
-        logger.debug("subscribe service "+serviceName);
+        logger.debug("subscribed service "+serviceName);
         this.proxy = new ProxyFactory(getInterfaceClass(), this).getProxy(getInterfaceClass().getClassLoader());
     }
 }

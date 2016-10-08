@@ -3,6 +3,7 @@ package com.bow.registry;
 import com.bow.config.Named;
 import com.bow.config.SPI;
 import com.bow.config.ServiceConfig;
+import com.bow.rpc.Request;
 import com.bow.rpc.URL;
 
 import java.util.List;
@@ -15,10 +16,10 @@ import java.util.List;
 public interface RegistryService extends Named{
     /**
      * 根据服务名查找提供该服务的server的地址
-     * @param serviceName 组名#接口全限定名#版本号  如 vv#com.bow.shine.IHello#0.1
+     * @param request 组名,接口全限定名,版本号
      * @return 提供此服务的服务器地址
      */
-    List<URL> lookup(String serviceName);
+    List<URL> lookup(Request request);
 
     /**
      * 注册服务

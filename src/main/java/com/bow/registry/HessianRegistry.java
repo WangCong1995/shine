@@ -4,6 +4,7 @@ import com.bow.common.exception.ShineException;
 import com.bow.common.exception.ShineExceptionCode;
 import com.bow.config.ServiceConfig;
 import com.bow.config.ShineConfig;
+import com.bow.rpc.Request;
 import com.bow.rpc.URL;
 import com.caucho.hessian.client.HessianProxyFactory;
 
@@ -34,9 +35,9 @@ public class HessianRegistry implements RegistryService {
         }
     }
     @Override
-    public List<URL> lookup(String serviceName) {
+    public List<URL> lookup(Request request) {
         ensureInitialized();
-        return proxy.lookup(serviceName);
+        return proxy.lookup(request);
     }
 
     @Override

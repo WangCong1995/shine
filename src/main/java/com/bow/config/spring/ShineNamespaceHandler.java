@@ -1,7 +1,5 @@
 package com.bow.config.spring;
 
-import com.bow.config.ReferenceBean;
-import com.bow.config.ServiceBean;
 import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
 
 /**

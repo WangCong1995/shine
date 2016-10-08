@@ -1,5 +1,6 @@
 package com.bow.config.spring;
 
+import com.bow.common.Version;
 import com.bow.common.exception.ShineException;
 import com.bow.common.exception.ShineExceptionCode;
 import com.bow.config.ReferenceBean;
@@ -30,7 +31,7 @@ public class ReferenceBeanDefinitionParser implements BeanDefinitionParser {
         }
 
         String version = element.getAttribute("version");
-        if(StringUtils.isNotEmpty(version)){
+        if(StringUtils.isNotEmpty(version)&& Version.isVersion(version)){
             beanDefinition.getPropertyValues().addPropertyValue("version", version);
         }
 

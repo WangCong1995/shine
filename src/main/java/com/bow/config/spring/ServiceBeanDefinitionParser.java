@@ -1,5 +1,6 @@
 package com.bow.config.spring;
 
+import com.bow.common.Version;
 import com.bow.common.exception.ShineException;
 import com.bow.common.exception.ShineExceptionCode;
 import com.bow.config.ServiceBean;
@@ -17,8 +18,8 @@ import org.w3c.dom.NodeList;
 /**
  * parse element like
  * <p>
- * <shine:service id="calculatorService" interface="com.bow.demo.Calculator" ref
- * ="defaultCalculator" />
+ * <shine:service id="calculatorService" interface="com.bow.demo.Calculator"
+ * ref ="defaultCalculator" />
  * 
  * @author vv
  * @since 2016/9/4.
@@ -32,6 +33,16 @@ public class ServiceBeanDefinitionParser implements BeanDefinitionParser {
         String id = element.getAttribute("id");
         beanDefinition.getPropertyValues().addPropertyValue("id", id);
 
+        String group = element.getAttribute("group");
+        if(StringUtils.isNotEmpty(group)){
+            beanDefinition.getPropertyValues().addPropertyValue("group", group);
+        }
+
+        String version = element.getAttribute("version");
+        if(StringUtils.isNotEmpty(version)&& Version.isVersion(version)){
+            beanDefinition.getPropertyValues().addPropertyValue("version", version);
+        }
+
         String interfaceName = element.getAttribute("interface");
         beanDefinition.getPropertyValues().addPropertyValue("interfaceName", interfaceName);
 
@@ -39,24 +50,25 @@ public class ServiceBeanDefinitionParser implements BeanDefinitionParser {
         String className = element.getAttribute("class");
 
         try {
-            //init service instance
-            if(StringUtils.isNotEmpty(refId)){
+            // init service instance
+            if (StringUtils.isNotEmpty(refId)) {
                 RuntimeBeanReference ref = new RuntimeBeanReference(refId);
                 beanDefinition.getPropertyValues().addPropertyValue("ref", ref);
-            }else if(className != null && className.length() > 0){
+            } else if (className != null && className.length() > 0) {
                 RootBeanDefinition classDefinition = new RootBeanDefinition();
                 classDefinition.setBeanClass(Class.forName(className));
                 classDefinition.setLazyInit(false);
-                //user can config the specified className's property
+                // user can config the specified className's property
                 parseProperties(element.getChildNodes(), classDefinition);
-                beanDefinition.getPropertyValues().addPropertyValue("ref", new BeanDefinitionHolder(classDefinition, id + "Impl"));
+                beanDefinition.getPropertyValues().addPropertyValue("ref",
+                        new BeanDefinitionHolder(classDefinition, id + "Impl"));
 
-            }else{
-                throw new ShineException("can't find ref or class in service bean "+id);
+            } else {
+                throw new ShineException("can't find ref or class in service bean " + id);
             }
             beanDefinition.getPropertyValues().addPropertyValue("interfaceClass", Class.forName(interfaceName));
         } catch (ClassNotFoundException e) {
-            throw new ShineException(ShineExceptionCode.configException,e);
+            throw new ShineException(ShineExceptionCode.configException, e);
         }
 
         parserContext.getRegistry().registerBeanDefinition(id, beanDefinition);
@@ -64,14 +76,12 @@ public class ServiceBeanDefinitionParser implements BeanDefinitionParser {
         return beanDefinition;
     }
 
-
     private static void parseProperties(NodeList nodeList, RootBeanDefinition beanDefinition) {
         if (nodeList != null && nodeList.getLength() > 0) {
             for (int i = 0; i < nodeList.getLength(); i++) {
                 Node node = nodeList.item(i);
                 if (node instanceof Element) {
-                    if ("property".equals(node.getNodeName())
-                            || "property".equals(node.getLocalName())) {
+                    if ("property".equals(node.getNodeName()) || "property".equals(node.getLocalName())) {
                         String name = ((Element) node).getAttribute("name");
                         if (name != null && name.length() > 0) {
                             String value = ((Element) node).getAttribute("value");
@@ -79,9 +89,12 @@ public class ServiceBeanDefinitionParser implements BeanDefinitionParser {
                             if (value != null && value.length() > 0) {
                                 beanDefinition.getPropertyValues().addPropertyValue(name, value);
                             } else if (ref != null && ref.length() > 0) {
-                                beanDefinition.getPropertyValues().addPropertyValue(name, new RuntimeBeanReference(ref));
+                                beanDefinition.getPropertyValues().addPropertyValue(name,
+                                        new RuntimeBeanReference(ref));
                             } else {
-                                throw new UnsupportedOperationException("Unsupported <property name=\"" + name + "\"> sub tag, Only supported <property name=\"" + name + "\" ref=\"...\" /> or <property name=\"" + name + "\" value=\"...\" />");
+                                throw new UnsupportedOperationException("Unsupported <property name=\"" + name
+                                        + "\"> sub tag, Only supported <property name=\"" + name
+                                        + "\" ref=\"...\" /> or <property name=\"" + name + "\" value=\"...\" />");
                             }
                         }
                     }
