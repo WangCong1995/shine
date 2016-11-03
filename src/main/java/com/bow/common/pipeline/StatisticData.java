@@ -88,7 +88,7 @@ public class StatisticData {
 
     /**
      * 下面的方法都是获取值
-     * @return
+     * @return 请求的数量
      */
     public long getClientRequestNum() {
         return this.clientRequestNum.intValue();

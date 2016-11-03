@@ -76,7 +76,7 @@ public class NettyServer implements ShineServer{
         future.addListener(new ChannelFutureListener() {
             @Override
             public void operationComplete(ChannelFuture future) throws Exception {
-                logger.info("----- success to start server -----");
+                logger.info("----- success to start netty server -----");
             }
         });
         serverChannel = future.channel();
@@ -96,7 +96,7 @@ public class NettyServer implements ShineServer{
     }
 
     @Override
-    public boolean start() {
+    public void start() {
         try {
             if(nettyServerHandler==null){
                 throw new ShineException("please set requestHandler with NettyServer#setRequestHandler");
@@ -105,16 +105,14 @@ public class NettyServer implements ShineServer{
         } catch (Exception e) {
             throw new ShineException(ShineExceptionCode.fail,e);
         }
-        return true;
     }
 
     @Override
-    public boolean stop() {
+    public void stop() {
         bossGroup.shutdownGracefully();
         workerGroup.shutdownGracefully();
         if(logger.isInfoEnabled()){
             logger.info("netty server shutdown");
         }
-        return true;
     }
 }

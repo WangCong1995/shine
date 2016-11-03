@@ -3,11 +3,10 @@ package com.bow.demo;
 import com.bow.common.ExtensionLoader;
 import com.bow.common.pipeline.LoadBalance;
 import com.bow.config.ShineConfig;
+import com.bow.demo.integration.api.Calculator;
 import com.bow.registry.RegistryService;
 import com.bow.rpc.Protocol;
 import org.junit.Test;
-
-import javax.xml.stream.events.Characters;
 
 /**
  * @author vv

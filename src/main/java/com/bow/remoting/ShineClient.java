@@ -13,8 +13,8 @@ import com.bow.rpc.Response;
 public interface ShineClient {
     /**
      * 调用服务端的方法
-     * @param message 请求的内容
+     * @param request 请求的内容
      * @return 服务端的响应
      */
-    Response call(Request message);
+    Response call(Request request);
 }

@@ -1,4 +1,4 @@
-package com.bow.demo;
+package com.bow.demo.integration.api;
 
 /**
  * Created by vv on 2016/8/19.

@@ -50,7 +50,7 @@ public class ZkRegistryService implements RegistryService {
      *
      * 注意：版本号1.2 能够匹配到1.2.1
      *
-     * @return
+     * @return 所有符合条件的url
      */
     @Override
     public List<URL> lookup(Request request) {

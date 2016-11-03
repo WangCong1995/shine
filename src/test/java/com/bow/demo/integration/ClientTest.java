@@ -1,5 +1,6 @@
-package com.bow.demo;
+package com.bow.demo.integration;
 
+import com.bow.demo.integration.api.Calculator;
 import org.junit.Test;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;

@@ -1,7 +1,7 @@
 package com.bow.rpc;
 
-import com.bow.remoting.HessianClient;
-import com.bow.remoting.HessianServer;
+import com.bow.remoting.hessian.HessianClient;
+import com.bow.remoting.hessian.HessianServer;
 import com.bow.remoting.ShineClient;
 import com.bow.remoting.ShineServer;
 

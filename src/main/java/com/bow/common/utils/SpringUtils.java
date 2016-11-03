@@ -14,7 +14,7 @@ import java.util.Map;
 /**
  *
  * @author ViVi
- * @date 2015年5月30日 下午4:55:55
+ * @since 2015年5月30日 下午4:55:55
  */
 public final class SpringUtils implements ApplicationContextAware {
 

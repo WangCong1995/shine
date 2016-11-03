@@ -1,4 +1,6 @@
-package com.bow.demo;
+package com.bow.demo.integration.service;
+
+import com.bow.demo.integration.api.Calculator;
 
 /**
  * Created by vv on 2016/8/19.

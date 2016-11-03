@@ -40,6 +40,9 @@ public abstract class AbstractProtocol implements Protocol {
         initRegistryService();
     }
 
+    /**
+     * 收到请求后，反射调用服务实现类获取结果
+     */
     protected RequestHandler requestHandler = new RequestHandler() {
         @Override
         public Response handle(Request message) {
@@ -59,6 +62,11 @@ public abstract class AbstractProtocol implements Protocol {
         }
     };
 
+    /**
+     * export service
+     * @param serviceConfig configured in spring xml
+     * @return boolean
+     */
     @Override
     public boolean export(ServiceConfig serviceConfig) {
         String serviceName = ShineUtils.getServiceName(serviceConfig);

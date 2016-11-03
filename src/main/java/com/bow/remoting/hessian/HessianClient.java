@@ -1,7 +1,8 @@
-package com.bow.remoting;
+package com.bow.remoting.hessian;
 
 import com.bow.common.exception.ShineException;
 import com.bow.common.exception.ShineExceptionCode;
+import com.bow.remoting.ShineClient;
 import com.bow.rpc.Request;
 import com.bow.rpc.Response;
 import com.bow.rpc.URL;
@@ -11,8 +12,10 @@ import org.slf4j.LoggerFactory;
 
 import java.net.MalformedURLException;
 
+
 /**
- * Created by vv on 2016/8/21.
+ * @author vv
+ * @since 2016/8/21.
  */
 public class HessianClient implements ShineClient {
     private static final Logger logger = LoggerFactory.getLogger(HessianClient.class);
@@ -22,13 +25,16 @@ public class HessianClient implements ShineClient {
         this.url = url;
     }
     @Override
-    public Response call(Request message) {
+    public Response call(Request request) {
 
-        String serverLocation = "http://"+url.getHost()+url.getPort();
+        String serverLocation = "http://"+url.getHost()+":"+url.getPort();
+        if(logger.isTraceEnabled()){
+            logger.trace("call hessian server "+serverLocation);
+        }
         HessianProxyFactory factory = new HessianProxyFactory();
         try {
             HessianCallService callService =(HessianCallService)factory.create(HessianCallService.class,serverLocation);
-            return callService.call(message);
+            return callService.call(request);
         } catch (MalformedURLException e) {
             throw new ShineException(ShineExceptionCode.fail,e);
         }

@@ -9,8 +9,8 @@ import com.bow.rpc.RequestHandlerAware;
  */
 public interface ShineServer extends RequestHandlerAware{
 
-    boolean start();
+    void start();
 
-    boolean stop();
+    void stop();
 
 }
