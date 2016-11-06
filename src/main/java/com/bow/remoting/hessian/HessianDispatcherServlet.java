@@ -1,5 +1,6 @@
 package com.bow.remoting.hessian;
 
+import com.bow.remoting.ShineServer;
 import com.bow.rpc.Request;
 import com.bow.rpc.RequestHandler;
 import com.bow.rpc.Response;
@@ -13,14 +14,14 @@ import com.caucho.hessian.server.HessianServlet;
  */
 public class HessianDispatcherServlet extends HessianServlet implements HessianCallService{
 
-    private RequestHandler requestHandler;
+    private ShineServer server;
 
-    public HessianDispatcherServlet(RequestHandler requestHandler){
-        this.requestHandler = requestHandler;
+    public HessianDispatcherServlet(ShineServer server){
+        this.server = server;
     }
 
     @Override
     public Response call(Request request) {
-        return requestHandler.handle(request);
+        return server.reply(request);
     }
 }

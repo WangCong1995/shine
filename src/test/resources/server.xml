@@ -9,7 +9,8 @@
 
 
     <bean id="defaultCalculator" class="com.bow.demo.integration.service.DefaultCalculator" />
-    <shine:service id="calculatorService" interface="com.bow.demo.integration.api.Calculator" ref="defaultCalculator" group="vv" version="1.2.3" />
+    <shine:service id="calculatorService" interface="com.bow.demo.integration.api.Calculator"
+                   ref="defaultCalculator" group="vv" version="1.2.3" />
 
     <!--
     <bean id="hessianRegistryService" class="com.bow.registry.HessianRegistryService" />

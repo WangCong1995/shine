@@ -6,15 +6,7 @@
  http://www.springframework.org/schema/beans/spring-beans.xsd
  http://bow.com/schema/shine  http://bow.com/schema/shine/shine.xsd
 ">
-
-    <!--
-    <bean id="mockServiceDemo" class="com.bow.demo.FailFastService"></bean>
-
-	<shine:reference id="c1" interface="com.bow.demo.Calculator"
-                     group="vv" version="1.0.0"
-                     mockServiceRef="mockServiceDemo"/>
-                     -->
-
-    <shine:reference id="c1" interface="com.bow.demo.integration.api.Calculator" group="vv" version="1.2" />
+    <shine:reference id="c1" interface="com.bow.demo.integration.api.Calculator"
+                     group="vv" version="1.2" />
 
  </beans>

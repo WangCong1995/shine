@@ -5,7 +5,9 @@ import com.bow.common.exception.ShineExceptionCode;
 import com.bow.common.utils.NetUtil;
 import com.bow.config.ShineConfig;
 import com.bow.remoting.ShineServer;
+import com.bow.rpc.Request;
 import com.bow.rpc.RequestHandler;
+import com.bow.rpc.Response;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
@@ -43,7 +45,7 @@ public class HessianServer implements ShineServer {
         if(requestHandler == null){
             throw new ShineException(ShineExceptionCode.fail,"requestHandler must not be null in jetty server");
         }
-        ServletHolder servletHolder = new ServletHolder(new HessianDispatcherServlet(requestHandler));
+        ServletHolder servletHolder = new ServletHolder(new HessianDispatcherServlet(this));
         context.addServlet(servletHolder,"/*");
 
 
@@ -53,6 +55,17 @@ public class HessianServer implements ShineServer {
         } catch (Exception e) {
             throw new ShineException(ShineExceptionCode.fail,"fail to start jetty server");
         }
+    }
+
+    /**
+     * 响应客户端请求
+     *
+     * @param request request
+     * @return Response
+     */
+    @Override
+    public Response reply(Request request) {
+        return requestHandler.handle(request);
     }
 
     public void stop() {

@@ -4,7 +4,9 @@ import com.bow.common.exception.ShineException;
 import com.bow.common.exception.ShineExceptionCode;
 import com.bow.config.ShineConfig;
 import com.bow.remoting.ShineServer;
+import com.bow.rpc.Request;
 import com.bow.rpc.RequestHandler;
+import com.bow.rpc.Response;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
@@ -35,12 +37,15 @@ import org.slf4j.LoggerFactory;
 public class NettyServer implements ShineServer{
 
     private static final Logger logger = LoggerFactory.getLogger(NettyServer.class);
+    /**
+     * 最原始的请求处理类
+     */
+    private RequestHandler requestHandler;
     private static final boolean SSL = false;
 
     private EventLoopGroup bossGroup = new NioEventLoopGroup(1);
     private EventLoopGroup workerGroup = new NioEventLoopGroup();
     private ServerBootstrap bootstrap = new ServerBootstrap();
-    private NettyServerHandler nettyServerHandler;
 
     private Channel serverChannel;
 
@@ -55,6 +60,7 @@ public class NettyServer implements ShineServer{
             sslCtx = null;
         }
 
+        NettyServerHandler nettyServerHandler = new NettyServerHandler(this);
         bootstrap.group(bossGroup, workerGroup)
                 .channel(NioServerSocketChannel.class)
                 .handler(new LoggingHandler(LogLevel.INFO))
@@ -92,19 +98,32 @@ public class NettyServer implements ShineServer{
 
     @Override
     public void setRequestHandler(RequestHandler requestHandler) {
-        nettyServerHandler = new NettyServerHandler(requestHandler);
+        this.requestHandler = requestHandler;
+
     }
 
     @Override
     public void start() {
         try {
-            if(nettyServerHandler==null){
+            if(requestHandler==null){
                 throw new ShineException("please set requestHandler with NettyServer#setRequestHandler");
             }
             bind(ShineConfig.getServicePort());
         } catch (Exception e) {
             throw new ShineException(ShineExceptionCode.fail,e);
         }
+    }
+
+    /**
+     * 响应客户端请求
+     *
+     * @param request request
+     * @return Response
+     */
+    @Override
+    public Response reply(Request request) {
+        //校验request和requestHandler
+        return requestHandler.handle(request);
     }
 
     @Override

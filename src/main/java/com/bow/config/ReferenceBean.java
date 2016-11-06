@@ -49,11 +49,11 @@ public class ReferenceBean extends ReferenceConfig
         logger.debug("invoke "+ShineUtils.getServiceName(request));
 
         ClientPipeline clientPipeline = DefaultClientPipeLine.getInstance();
-        Response result = clientPipeline.sendRequest(request);
-        if (result.getCause() != null) {
-            throw new ShineException(ShineExceptionCode.fail, result.getCause());
+        Response response = clientPipeline.sendRequest(request);
+        if (response.getCause() != null) {
+            throw new ShineException(ShineExceptionCode.fail, response.getCause());
         }
-        return result.getValue();
+        return response.getValue();
     }
 
     private Request buildRequest(MethodInvocation invocation) {

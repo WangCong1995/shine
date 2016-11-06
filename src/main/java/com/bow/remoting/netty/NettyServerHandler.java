@@ -1,5 +1,8 @@
 package com.bow.remoting.netty;
 
+import com.bow.common.exception.ShineException;
+import com.bow.common.exception.ShineExceptionCode;
+import com.bow.remoting.ShineServer;
 import com.bow.rpc.Request;
 import com.bow.rpc.RequestHandler;
 import com.bow.rpc.Response;
@@ -15,10 +18,10 @@ import org.slf4j.LoggerFactory;
 @ChannelHandler.Sharable
 public class NettyServerHandler extends ChannelInboundHandlerAdapter {
 
-    private RequestHandler requestHandler;
+    private ShineServer server;
 
-    public NettyServerHandler(RequestHandler requestHandler){
-        this.requestHandler = requestHandler;
+    public NettyServerHandler(ShineServer server){
+        this.server = server;
     }
 
     private static final Logger logger = LoggerFactory.getLogger(ChannelInboundHandlerAdapter.class);
@@ -39,7 +42,10 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter {
             if(logger.isDebugEnabled()){
                 logger.debug("received request:"+request);
             }
-            Response response = requestHandler.handle(request);
+            if(server==null){
+                throw new ShineException(ShineExceptionCode.fail,"server must not be null");
+            }
+            Response response = server.reply(request);
             ctx.write(response);
         }
 
