@@ -59,6 +59,9 @@ public class ChannelPoolTest {
         return m;
     }
 
+    /**
+     * 对连接池进行不同配置，测试其多线程下的性能
+     */
     @Test
     public void config() {
         ChannelPoolConfig.get().setMaxIdle(3);
