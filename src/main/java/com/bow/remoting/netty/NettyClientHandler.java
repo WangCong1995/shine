@@ -1,6 +1,7 @@
 package com.bow.remoting.netty;
 
 import com.bow.rpc.Response;
+import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import org.slf4j.Logger;
@@ -16,7 +17,10 @@ public class NettyClientHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) {
-        logger.info("channel is activated, id "+ctx.channel().id());
+        Channel channel = ctx.channel();
+        String id = channel.id().asShortText();
+        String remote = channel.remoteAddress().toString();
+        logger.info("channel is activated, id " + id + " to " + remote);
     }
 
     /**
@@ -24,7 +28,7 @@ public class NettyClientHandler extends ChannelInboundHandlerAdapter {
      */
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) {
-        if(msg instanceof Response){
+        if (msg instanceof Response) {
             Response result = (Response) msg;
             NettyChannelFuture future = NettyChannelFuture.getFuture(result.getId());
             future.receive(result);
@@ -38,7 +42,7 @@ public class NettyClientHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
-        logger.error("netty channel exception caught",cause);
+        logger.error("netty channel exception caught", cause);
         ctx.close();
     }
 }

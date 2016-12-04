@@ -52,14 +52,6 @@ public class NettyServer implements ShineServer{
     private void bind(final int port) throws Exception {
         NettyHelper.setNettyLoggerFactory();
 
-        final SslContext sslCtx;
-        if (SSL) {
-            SelfSignedCertificate ssc = new SelfSignedCertificate();
-            sslCtx = SslContextBuilder.forServer(ssc.certificate(), ssc.privateKey()).build();
-        } else {
-            sslCtx = null;
-        }
-
         NettyServerHandler nettyServerHandler = new NettyServerHandler(this);
         bootstrap.group(bossGroup, workerGroup)
                 .channel(NioServerSocketChannel.class)
@@ -68,13 +60,9 @@ public class NettyServer implements ShineServer{
                     @Override
                     public void initChannel(SocketChannel ch) throws Exception {
                         ChannelPipeline p = ch.pipeline();
-                        if (sslCtx != null) {
-                            p.addLast(sslCtx.newHandler(ch.alloc()));
-                        }
-                        p.addLast(
-                                new ObjectEncoder(),
-                                new ObjectDecoder(ClassResolvers.cacheDisabled(null)),
-                                nettyServerHandler);
+                        p.addLast(new ObjectEncoder());
+                        p.addLast(new ObjectDecoder(ClassResolvers.cacheDisabled(null)));
+                        p.addLast(nettyServerHandler);
                     }
                 });
 

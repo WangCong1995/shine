@@ -31,8 +31,8 @@ public class ShineConfig {
     private ShineConfig(){
         try{
             protocol = PropertiesUtil.getProperty("protocol");
-            servicePort = Integer.parseInt(PropertiesUtil.getProperty("service.port","9000"));
-            maxConcurrentRequestLimits = Integer.parseInt(PropertiesUtil.getProperty("max.concurrent.request.limits","100"));
+            servicePort = PropertiesUtil.getInt("service.port",9000);
+            maxConcurrentRequestLimits = PropertiesUtil.getInt("max.concurrent.request.limits",100);
             registryUrl = PropertiesUtil.getProperty("registry.url");
             registryType = PropertiesUtil.getProperty("registry.type");
             loadBalance = PropertiesUtil.getProperty("loadBalance");

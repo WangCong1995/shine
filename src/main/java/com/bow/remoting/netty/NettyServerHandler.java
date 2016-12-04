@@ -18,17 +18,17 @@ import org.slf4j.LoggerFactory;
 @ChannelHandler.Sharable
 public class NettyServerHandler extends ChannelInboundHandlerAdapter {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(NettyServerHandler.class);
+
     private ShineServer server;
 
-    public NettyServerHandler(ShineServer server){
+    public NettyServerHandler(ShineServer server) {
         this.server = server;
     }
 
-    private static final Logger logger = LoggerFactory.getLogger(ChannelInboundHandlerAdapter.class);
-
     @Override
     public void channelActive(ChannelHandlerContext ctx) {
-        logger.info("server channelActive");
+        LOGGER.info(" channelActive id " + ctx.channel().id().asShortText());
     }
 
     /**
@@ -37,15 +37,18 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) {
 
-        if(msg instanceof  Request){
+        if (msg instanceof Request) {
             Request request = (Request) msg;
-            if(logger.isDebugEnabled()){
-                logger.debug("received request:"+request);
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("channel id: " + ctx.channel().id().asShortText() + " receive\n" + request);
             }
-            if(server==null){
-                throw new ShineException(ShineExceptionCode.fail,"server must not be null");
+            if (server == null) {
+                throw new ShineException(ShineExceptionCode.fail, "server must not be null");
             }
             Response response = server.reply(request);
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("channel id: " + ctx.channel().id().asShortText() + " reply\n" + response);
+            }
             ctx.write(response);
         }
 
@@ -53,13 +56,13 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelReadComplete(ChannelHandlerContext ctx) {
-        //在进入下个handler前调用ctx.flush()
+        // 在进入下个handler前调用ctx.flush()
         ctx.flush();
     }
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
-        logger.error("server exceptionCaught",cause);
+        LOGGER.error("channel id " + ctx.channel().id().asShortText(), cause);
         ctx.close();
     }
 }

@@ -1,24 +1,31 @@
 package com.bow.rpc;
 
 import com.alibaba.fastjson.JSON;
+import com.bow.common.utils.RequestIdGenerator;
 
 import java.io.Serializable;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * message transport to server
+ * 
  * @author vv
  * @since 2016/8/20.
  */
 public class Request implements Serializable {
 
-    private static final AtomicLong SEQUENCE = new AtomicLong(0);
-    private final long id ;
+    private long id;
+
     private String group = "default";
+
     private String interfaceName;
+
     private String version;
+
     private String methodName;
+
     private Class<?>[] parameterTypes;
+
     private Object[] parameters;
 
     /**
@@ -26,17 +33,12 @@ public class Request implements Serializable {
      */
     private URL serverUrl;
 
-    public Request(){
-        this.id = newId();
+    public Request() {
+        this.id = RequestIdGenerator.getRequestId();
     }
 
-    public Request(long id){
+    public Request(long id) {
         this.id = id;
-    }
-
-    private long newId() {
-        //after grow to double maximum , +1 make it be minimum
-        return SEQUENCE.getAndIncrement();
     }
 
     public long getId() {
@@ -102,14 +104,15 @@ public class Request implements Serializable {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
+        sb.append("requestId: ").append(id).append(" , ");
         sb.append(group).append("#");
         sb.append(interfaceName).append("#").append(methodName);
         sb.append("(");
         int index = 0;
-        if(parameters!=null){
+        if (parameters != null) {
 
-            for(Object param:parameters){
-                if(index!=0){
+            for (Object param : parameters) {
+                if (index != 0) {
                     sb.append(",");
                 }
                 index++;
@@ -118,6 +121,6 @@ public class Request implements Serializable {
 
         }
         sb.append(")");
-        return  sb.toString();
+        return sb.toString();
     }
 }
