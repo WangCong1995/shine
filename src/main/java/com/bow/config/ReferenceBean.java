@@ -5,7 +5,7 @@ import com.bow.common.ExtensionLoader;
 import com.bow.common.exception.ShineException;
 import com.bow.common.exception.ShineExceptionCode;
 import com.bow.common.pipeline.ClientPipeline;
-import com.bow.common.pipeline.DefaultClientPipeLine;
+import com.bow.common.pipeline.DefaultClientPipeline;
 import com.bow.common.utils.ShineUtils;
 import com.bow.registry.RegistryFactory;
 import com.bow.registry.RegistryService;
@@ -48,7 +48,7 @@ public class ReferenceBean extends ReferenceConfig
         Request request = buildRequest(methodInvocation);
         logger.debug("invoke "+ShineUtils.getServiceName(request));
 
-        ClientPipeline clientPipeline = DefaultClientPipeLine.getInstance();
+        ClientPipeline clientPipeline = DefaultClientPipeline.getInstance();
         Response response = clientPipeline.sendRequest(request);
         if (response.getCause() != null) {
             throw new ShineException(ShineExceptionCode.fail, response.getCause());

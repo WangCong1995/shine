@@ -7,6 +7,7 @@ package com.bow.common.pipeline;
  * @since 2016/10/4.
  */
 public class StandardPipeline implements ShinePipeline {
+
     protected ShineHandlerContext first;
 
     protected ShineHandlerContext last;
@@ -43,5 +44,6 @@ public class StandardPipeline implements ShinePipeline {
     public void add(ShineHandler handler) {
         addLast(handler);
     }
+
 
 }

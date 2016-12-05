@@ -1,5 +1,7 @@
 package com.bow.remoting.hessian;
 
+import com.bow.common.pipeline.DefaultServerPipeline;
+import com.bow.common.pipeline.DefaultShinePipeline;
 import com.bow.remoting.ShineServer;
 import com.bow.rpc.Request;
 import com.bow.rpc.RequestHandler;
@@ -14,14 +16,9 @@ import com.caucho.hessian.server.HessianServlet;
  */
 public class HessianDispatcherServlet extends HessianServlet implements HessianCallService{
 
-    private ShineServer server;
-
-    public HessianDispatcherServlet(ShineServer server){
-        this.server = server;
-    }
 
     @Override
     public Response call(Request request) {
-        return server.reply(request);
+        return DefaultServerPipeline.getInstance().receiveRequest(request);
     }
 }

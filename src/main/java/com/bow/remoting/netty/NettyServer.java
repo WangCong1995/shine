@@ -2,6 +2,12 @@ package com.bow.remoting.netty;
 
 import com.bow.common.exception.ShineException;
 import com.bow.common.exception.ShineExceptionCode;
+import com.bow.common.pipeline.DefaultServerPipeline;
+import com.bow.common.pipeline.DefaultShinePipeline;
+import com.bow.common.pipeline.EmptyHandler;
+import com.bow.common.pipeline.InvokeServiceHandler;
+import com.bow.common.pipeline.SendResponseHandler;
+import com.bow.common.pipeline.ShinePipeline;
 import com.bow.config.ShineConfig;
 import com.bow.remoting.ShineServer;
 import com.bow.rpc.Request;
@@ -22,17 +28,13 @@ import io.netty.handler.codec.serialization.ObjectDecoder;
 import io.netty.handler.codec.serialization.ObjectEncoder;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
-import io.netty.handler.ssl.SslContext;
-import io.netty.handler.ssl.SslContextBuilder;
-import io.netty.handler.ssl.util.SelfSignedCertificate;
-import io.netty.util.concurrent.Future;
-import io.netty.util.concurrent.GenericFutureListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * Netty Server
- * Created by vv on 2016/9/3.
+ * @author vv
+ * @since 2016/9/3.
  */
 public class NettyServer implements ShineServer{
 
@@ -41,17 +43,17 @@ public class NettyServer implements ShineServer{
      * 最原始的请求处理类
      */
     private RequestHandler requestHandler;
-    private static final boolean SSL = false;
 
     private EventLoopGroup bossGroup = new NioEventLoopGroup(1);
     private EventLoopGroup workerGroup = new NioEventLoopGroup();
-    private ServerBootstrap bootstrap = new ServerBootstrap();
+    private ServerBootstrap bootstrap;
 
     private Channel serverChannel;
 
     private void bind(final int port) throws Exception {
         NettyHelper.setNettyLoggerFactory();
 
+        bootstrap = new ServerBootstrap();
         NettyServerHandler nettyServerHandler = new NettyServerHandler(this);
         bootstrap.group(bossGroup, workerGroup)
                 .channel(NioServerSocketChannel.class)
@@ -78,7 +80,7 @@ public class NettyServer implements ShineServer{
         closeFuture.addListener(new ChannelFutureListener(){
             @Override
             public void operationComplete(ChannelFuture future) throws Exception {
-                logger.info("already close netty server channel");
+                logger.info("close netty server channel");
             }
         });
     }
@@ -87,6 +89,10 @@ public class NettyServer implements ShineServer{
     @Override
     public void setRequestHandler(RequestHandler requestHandler) {
         this.requestHandler = requestHandler;
+        InvokeServiceHandler invokeHandler = new InvokeServiceHandler(requestHandler);
+
+        ShinePipeline serverPipeline = DefaultServerPipeline.getInstance();
+        serverPipeline.addLast(invokeHandler);
 
     }
 
@@ -102,17 +108,6 @@ public class NettyServer implements ShineServer{
         }
     }
 
-    /**
-     * 响应客户端请求
-     *
-     * @param request request
-     * @return Response
-     */
-    @Override
-    public Response reply(Request request) {
-        //校验request和requestHandler
-        return requestHandler.handle(request);
-    }
 
     @Override
     public void stop() {

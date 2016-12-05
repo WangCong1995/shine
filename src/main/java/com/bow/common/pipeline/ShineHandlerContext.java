@@ -41,7 +41,7 @@ public class ShineHandlerContext {
 
     /**
      * 客户端管道：由后往前传递响应
-     * 
+     *
      * @param message message in pipeline
      */
     public void prevReceiveResponse(PipelineMessage message) {
@@ -54,13 +54,37 @@ public class ShineHandlerContext {
 
     /**
      * 当catch到exception后，由后往前传递
-     * 
+     *
      * @param message message in pipeline
      */
     public void prevCatchException(PipelineMessage message) {
         ShineHandlerContext nextContext = this.prev;
         if (nextContext != null) {
             nextContext.handler.onCatchException(nextContext, message);
+        }
+    }
+
+    /**
+     * 服务端管道：从前往后传递请求
+     *
+     * @param message message in pipeline
+     */
+    public void nextReceiveRequest(PipelineMessage message) {
+        ShineHandlerContext nextContext = this.next;
+        if (nextContext != null) {
+            nextContext.handler.onReceiveRequest(nextContext, message);
+        }
+    }
+
+    /**
+     * 服务端管道：由后往前传递响应
+     *
+     * @param message message in pipeline
+     */
+    public void prevSendResponse(PipelineMessage message) {
+        ShineHandlerContext nextContext = this.prev;
+        if (nextContext != null) {
+            nextContext.handler.onSendResponse(nextContext, message);
         }
     }
 }

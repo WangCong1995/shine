@@ -7,9 +7,9 @@ import com.bow.rpc.Response;
  * @author vv
  * @since 2016/10/4.
  */
-public class DefaultClientPipeLine extends StandardPipeline implements ClientPipeline {
+public class DefaultClientPipeline extends StandardPipeline implements ClientPipeline {
 
-    private static DefaultClientPipeLine instance = new DefaultClientPipeLine();
+    private static DefaultClientPipeline instance = new DefaultClientPipeline();
 
     static {
         instance.add(new ConcurrentLimitClientHandler());

@@ -2,6 +2,8 @@ package com.bow.remoting.hessian;
 
 import com.bow.common.exception.ShineException;
 import com.bow.common.exception.ShineExceptionCode;
+import com.bow.common.pipeline.DefaultShinePipeline;
+import com.bow.common.pipeline.InvokeServiceHandler;
 import com.bow.common.utils.NetUtil;
 import com.bow.config.ShineConfig;
 import com.bow.remoting.ShineServer;
@@ -31,6 +33,10 @@ public class HessianServer implements ShineServer {
     private RequestHandler requestHandler;
 
     public void start() {
+        if(requestHandler == null){
+            throw new ShineException(ShineExceptionCode.fail,"requestHandler must not be null in jetty server");
+        }
+
         Server server = new Server();
         ServerConnector connector = new ServerConnector(server);
         connector.setHost(NetUtil.getLocalHostAddress());
@@ -42,10 +48,7 @@ public class HessianServer implements ShineServer {
         context.setContextPath("/");
         server.setHandler(context);
 
-        if(requestHandler == null){
-            throw new ShineException(ShineExceptionCode.fail,"requestHandler must not be null in jetty server");
-        }
-        ServletHolder servletHolder = new ServletHolder(new HessianDispatcherServlet(this));
+        ServletHolder servletHolder = new ServletHolder(new HessianDispatcherServlet());
         context.addServlet(servletHolder,"/*");
 
 
@@ -57,17 +60,6 @@ public class HessianServer implements ShineServer {
         }
     }
 
-    /**
-     * 响应客户端请求
-     *
-     * @param request request
-     * @return Response
-     */
-    @Override
-    public Response reply(Request request) {
-        return requestHandler.handle(request);
-    }
-
     public void stop() {
         //no-op
     }
@@ -76,5 +68,7 @@ public class HessianServer implements ShineServer {
     @Override
     public void setRequestHandler(RequestHandler requestHandler) {
         this.requestHandler = requestHandler;
+        InvokeServiceHandler invokeHandler = new InvokeServiceHandler(requestHandler);
+        DefaultShinePipeline.getServerPipeline().addLast(invokeHandler);
     }
 }

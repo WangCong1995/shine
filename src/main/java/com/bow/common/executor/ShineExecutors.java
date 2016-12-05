@@ -9,6 +9,9 @@ import java.util.concurrent.TimeUnit;
  * Created by vv on 2016/9/1.
  */
 public class ShineExecutors {
+
+
+    private static ExecutorService bizPool = newCachedThreadPool(20,"biz");
     /**
      * 对于提交新任务，必须等到有线程池中的线程接收，才解除阻塞
      * @param maxPoolSize 最大线程数
@@ -18,5 +21,9 @@ public class ShineExecutors {
     public static ExecutorService newCachedThreadPool(int maxPoolSize, String poolName) {
         return new ThreadPoolExecutor(0, maxPoolSize, 60L, TimeUnit.SECONDS, new SynchronousQueue<Runnable>(),
                 new NamedThreadFactory(poolName));
+    }
+
+    public static ExecutorService getBizPool(){
+        return  bizPool;
     }
 }

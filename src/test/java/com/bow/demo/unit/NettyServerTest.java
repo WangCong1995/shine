@@ -1,5 +1,6 @@
 package com.bow.demo.unit;
 
+import com.bow.common.pipeline.DefaultShinePipeline;
 import com.bow.remoting.netty.NettyServer;
 import com.bow.rpc.Request;
 import com.bow.rpc.RequestHandler;
@@ -22,7 +23,7 @@ public class NettyServerTest {
             public Response handle(Request message) {
                 try {
                     //模拟处理比较耗时
-                    TimeUnit.MILLISECONDS.sleep(500);
+                    TimeUnit.MILLISECONDS.sleep(10);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
