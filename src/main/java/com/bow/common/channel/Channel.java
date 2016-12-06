@@ -30,6 +30,6 @@ public interface Channel {
      * @param request request
      * @return Response
      */
-    Response call(Request request);
+    boolean send(Request request);
 
 }

@@ -1,29 +1,32 @@
 package com.bow.remoting.netty;
 
-import com.bow.common.exception.ShineException;
-import com.bow.common.exception.ShineExceptionCode;
+import io.netty.channel.ChannelDuplexHandler;
+import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.timeout.IdleState;
-import org.jboss.netty.channel.ChannelHandlerContext;
-import org.jboss.netty.handler.timeout.IdleStateAwareChannelHandler;
-import org.jboss.netty.handler.timeout.IdleStateEvent;
+import io.netty.handler.timeout.IdleStateEvent;
 
 /**
+ * HeartbeatHandler
  *
- * Created by vv on 2016/9/1.
+ * @author vv
+ * @since 2016/9/1.
  */
-public class HeartbeatHandler extends IdleStateAwareChannelHandler {
-    private static int MAX_WAIT = 10;
-    private int count;
-    @Override
-    public void channelIdle(ChannelHandlerContext ctx, IdleStateEvent e) throws Exception {
+public class HeartbeatHandler extends ChannelDuplexHandler {
 
-        super.channelIdle(ctx, e);
-        if(IdleState.WRITER_IDLE.equals(e.getState())){
-            count++;
-        }
-        if(count==MAX_WAIT){
-            e.getChannel().close();
-            throw new ShineException(ShineExceptionCode.connectionException);
+
+    /**
+     * 解析事件，然后ping服务器
+     * @param ctx ctx
+     * @param evt evt
+     * @throws Exception e
+     */
+    @Override
+    public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
+        if(evt instanceof IdleStateEvent){
+            IdleStateEvent event = (IdleStateEvent) evt;
+            if(event.state() == IdleState.ALL_IDLE){
+                ctx.channel().writeAndFlush("ping");
+            }
         }
     }
 }

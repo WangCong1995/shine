@@ -1,11 +1,7 @@
 package com.bow.remoting.netty;
 
-import com.bow.common.exception.ShineException;
-import com.bow.common.exception.ShineExceptionCode;
 import com.bow.common.executor.ShineExecutors;
 import com.bow.common.pipeline.DefaultServerPipeline;
-import com.bow.common.pipeline.DefaultShinePipeline;
-import com.bow.remoting.ShineServer;
 import com.bow.rpc.Request;
 import com.bow.rpc.Response;
 import io.netty.channel.Channel;
@@ -17,6 +13,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * NettyServerHandler
+ * 
  * @author vv
  * @since 2016/9/3.
  */
@@ -25,11 +22,6 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(NettyServerHandler.class);
 
-    private ShineServer server;
-
-    public NettyServerHandler(ShineServer server) {
-        this.server = server;
-    }
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) {
@@ -47,18 +39,21 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter {
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug("channel id: " + ctx.channel().id().asShortText() + " receive\n" + request);
             }
-            if (server == null) {
-                throw new ShineException(ShineExceptionCode.fail, "server must not be null");
-            }
+
             ShineExecutors.getBizPool().submit(new BizTask(ctx.channel(), request));
+        } else if (msg instanceof String) {
+            //心跳
+            LOGGER.debug("receive " + msg);
+            ctx.channel().writeAndFlush("pong");
         }
     }
 
-    class BizTask implements Runnable{
+    class BizTask implements Runnable {
         private Channel channel;
+
         private Request request;
 
-        public BizTask(Channel channel, Request request){
+        public BizTask(Channel channel, Request request) {
             this.channel = channel;
             this.request = request;
         }

@@ -23,7 +23,7 @@ public class NettyServerTest {
             public Response handle(Request message) {
                 try {
                     //模拟处理比较耗时
-                    TimeUnit.MILLISECONDS.sleep(10);
+                    TimeUnit.MILLISECONDS.sleep(100);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }

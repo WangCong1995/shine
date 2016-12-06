@@ -78,12 +78,12 @@ public class NettyChannel implements Channel {
      * @return Response
      */
     @Override
-    public Response call(Request request) {
+    public boolean send(Request request) {
         if (!isActive()) {
             throw new ShineException(ShineExceptionCode.connectionException, this.toString());
         }
-        ChannelFuture future = rawChannel.writeAndFlush(request);
-        future.addListener(new ChannelFutureListener() {
+        ChannelFuture writeFuture = rawChannel.writeAndFlush(request);
+        writeFuture.addListener(new ChannelFutureListener() {
             @Override
             public void operationComplete(ChannelFuture future) throws Exception {
                 if (LOGGER.isDebugEnabled()) {
@@ -91,8 +91,11 @@ public class NettyChannel implements Channel {
                 }
             }
         });
-        ShineFuture<Response> shineFuture = new NettyChannelFuture(request.getId());
-        return shineFuture.get(2000, TimeUnit.MILLISECONDS);
+        boolean result = writeFuture.awaitUninterruptibly(2, TimeUnit.SECONDS);
+        if (!result || !writeFuture.isSuccess()) {
+            writeFuture.cancel(true);
+        }
+        return result;
     }
 
     /**

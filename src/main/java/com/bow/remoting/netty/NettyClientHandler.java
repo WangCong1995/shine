@@ -13,14 +13,14 @@ import org.slf4j.LoggerFactory;
  */
 public class NettyClientHandler extends ChannelInboundHandlerAdapter {
 
-    private final Logger logger = LoggerFactory.getLogger(NettyClientHandler.class);
+    private final Logger LOGGER = LoggerFactory.getLogger(NettyClientHandler.class);
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) {
         Channel channel = ctx.channel();
         String id = channel.id().asShortText();
         String remote = channel.remoteAddress().toString();
-        logger.info("channel is activated, id " + id + " to " + remote);
+        LOGGER.info("channel is activated, id " + id + " to " + remote);
     }
 
     /**
@@ -31,7 +31,11 @@ public class NettyClientHandler extends ChannelInboundHandlerAdapter {
         if (msg instanceof Response) {
             Response result = (Response) msg;
             NettyChannelFuture future = NettyChannelFuture.getFuture(result.getId());
+            //通知future解除阻塞
             future.receive(result);
+        }else if (msg instanceof String) {
+            //心跳
+            LOGGER.debug("receive " + msg);
         }
     }
 
@@ -42,7 +46,8 @@ public class NettyClientHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
-        logger.error("netty channel exception caught", cause);
+        LOGGER.error("netty channel exception caught", cause);
+        ctx.channel().close();
         ctx.close();
     }
 }

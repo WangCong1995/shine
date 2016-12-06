@@ -28,6 +28,7 @@ import io.netty.handler.codec.serialization.ObjectDecoder;
 import io.netty.handler.codec.serialization.ObjectEncoder;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
+import io.netty.handler.timeout.IdleStateHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,6 +40,8 @@ import org.slf4j.LoggerFactory;
 public class NettyServer implements ShineServer{
 
     private static final Logger logger = LoggerFactory.getLogger(NettyServer.class);
+
+
     /**
      * 最原始的请求处理类
      */
@@ -54,7 +57,6 @@ public class NettyServer implements ShineServer{
         NettyHelper.setNettyLoggerFactory();
 
         bootstrap = new ServerBootstrap();
-        NettyServerHandler nettyServerHandler = new NettyServerHandler(this);
         bootstrap.group(bossGroup, workerGroup)
                 .channel(NioServerSocketChannel.class)
                 .handler(new LoggingHandler(LogLevel.INFO))
@@ -64,7 +66,7 @@ public class NettyServer implements ShineServer{
                         ChannelPipeline p = ch.pipeline();
                         p.addLast(new ObjectEncoder());
                         p.addLast(new ObjectDecoder(ClassResolvers.cacheDisabled(null)));
-                        p.addLast(nettyServerHandler);
+                        p.addLast(new NettyServerHandler());
                     }
                 });
 
