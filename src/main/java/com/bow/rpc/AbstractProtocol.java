@@ -71,9 +71,16 @@ public abstract class AbstractProtocol implements Protocol {
     public boolean export(ServiceConfig serviceConfig) {
         String serviceName = ShineUtils.getServiceName(serviceConfig);
         exportedMap.put(serviceName, serviceConfig);
+        //开服务
         ensureServerInitialized();
+
+        URL providerUrl = new URL(this.getName(), NetUtil.getLocalHostAddress(), ShineConfig.getServicePort());
+        //设置暴露的接口
+        providerUrl.setResource(serviceConfig.getInterfaceName());
+        providerUrl.setParameter(URL.GROUP, serviceConfig.getGroup());
+        providerUrl.setParameter(URL.VERSION, serviceConfig.getVersion());
         // 注册
-        registry.register(serviceConfig, new URL(NetUtil.getLocalHostAddress(), ShineConfig.getServicePort()));
+        registry.register(providerUrl);
 
         return true;
     }

@@ -12,6 +12,8 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.net.UnknownHostException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Created by vv on 2016/8/21.
@@ -75,6 +77,40 @@ public class NetUtil {
         StringBuilder sbBuilder = new StringBuilder();
         sbBuilder.append(socketAddress.getAddress().getHostAddress()).append(":").append(socketAddress.getPort());
         return sbBuilder.toString();
+    }
+
+    /**
+     * parse
+     * @param urlString urlString
+     * @return URL
+     */
+    public static URL parse(String urlString){
+        Pattern pattern = Pattern.compile("(.*)://([0-9\\.]+):(\\d+)/(.*)");
+        Matcher matcher = pattern.matcher(urlString);
+        if(!matcher.matches()){
+            throw new ShineException(ShineExceptionCode.fail,"wrong url format "+urlString);
+        }
+
+        URL url = new URL(matcher.group(1), matcher.group(2), Integer.parseInt(matcher.group(3)));
+        String remain = matcher.group(4);
+        int separator = remain.indexOf("?");
+        if(separator<0){
+            //没有其他参数
+            url.setResource(remain);
+        }else{
+            String resource = remain.substring(0,separator);
+            url.setResource(resource);
+            String paramStr = remain.substring(separator+1);
+            String[] paramAry = paramStr.split("&");
+            for(String param : paramAry){
+                String[] entry = param.split("=");
+                if(entry.length!=2){
+                    throw new ShineException(ShineExceptionCode.fail,"wrong url format "+urlString);
+                }
+                url.setParameter(entry[0], entry[1]);
+            }
+        }
+        return url;
     }
 
 }

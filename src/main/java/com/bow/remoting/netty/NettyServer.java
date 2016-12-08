@@ -3,16 +3,11 @@ package com.bow.remoting.netty;
 import com.bow.common.exception.ShineException;
 import com.bow.common.exception.ShineExceptionCode;
 import com.bow.common.pipeline.DefaultServerPipeline;
-import com.bow.common.pipeline.DefaultShinePipeline;
-import com.bow.common.pipeline.EmptyHandler;
 import com.bow.common.pipeline.InvokeServiceHandler;
-import com.bow.common.pipeline.SendResponseHandler;
 import com.bow.common.pipeline.ShinePipeline;
 import com.bow.config.ShineConfig;
 import com.bow.remoting.ShineServer;
-import com.bow.rpc.Request;
 import com.bow.rpc.RequestHandler;
-import com.bow.rpc.Response;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
@@ -28,7 +23,6 @@ import io.netty.handler.codec.serialization.ObjectDecoder;
 import io.netty.handler.codec.serialization.ObjectEncoder;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
-import io.netty.handler.timeout.IdleStateHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,7 +34,6 @@ import org.slf4j.LoggerFactory;
 public class NettyServer implements ShineServer{
 
     private static final Logger logger = LoggerFactory.getLogger(NettyServer.class);
-
 
     /**
      * 最原始的请求处理类
@@ -92,21 +85,19 @@ public class NettyServer implements ShineServer{
     public void setRequestHandler(RequestHandler requestHandler) {
         this.requestHandler = requestHandler;
         InvokeServiceHandler invokeHandler = new InvokeServiceHandler(requestHandler);
-
         ShinePipeline serverPipeline = DefaultServerPipeline.getInstance();
         serverPipeline.addLast(invokeHandler);
-
     }
 
     @Override
     public void start() {
         try {
-            if(requestHandler==null){
+            if (requestHandler == null) {
                 throw new ShineException("please set requestHandler with NettyServer#setRequestHandler");
             }
             bind(ShineConfig.getServicePort());
         } catch (Exception e) {
-            throw new ShineException(ShineExceptionCode.fail,e);
+            throw new ShineException(ShineExceptionCode.fail, e);
         }
     }
 

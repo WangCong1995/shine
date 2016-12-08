@@ -24,7 +24,7 @@ public class ServiceConfig<T> {
      */
     private String group="default";
 
-    private String version;
+    private String version="";
 
     public String getVersion() {
         return version;

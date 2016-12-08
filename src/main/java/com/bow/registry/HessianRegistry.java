@@ -41,9 +41,9 @@ public class HessianRegistry implements RegistryService {
     }
 
     @Override
-    public boolean register(ServiceConfig serviceConfig, URL providerUrl) {
+    public boolean register(URL providerUrl) {
         ensureInitialized();
-        return proxy.register(serviceConfig,providerUrl);
+        return proxy.register(providerUrl);
     }
 
     @Override

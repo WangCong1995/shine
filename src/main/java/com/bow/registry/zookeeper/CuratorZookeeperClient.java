@@ -125,7 +125,8 @@ public class CuratorZookeeperClient extends AbstractZookeeperClient {
     }
 
     /**
-     * 给path节点绑定一个监听器，其子节点发生变化会触发ChildListener
+     * 给path的每个子节点绑定一个监听器；子节点发生变化会触发ChildListener<br/>
+     * 注意client.getChildren().forPath(path)获取到了子节点，usingWatcher(watcher)绑定监听
      * @param path path
      * @param listener listener
      * @return path的子节点

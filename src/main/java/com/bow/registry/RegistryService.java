@@ -23,11 +23,10 @@ public interface RegistryService extends Named{
 
     /**
      * 注册服务
-     * @param serviceConfig 服务信息
-     * @param providerUrl 服务提供者地址
+     * @param providerUrl 服务信息节点
      * @return 注册成功/失败
      */
-    boolean register(ServiceConfig serviceConfig,URL providerUrl);
+    boolean register(URL providerUrl);
 
     /**
      * 订阅

@@ -52,7 +52,7 @@ public interface ZookeeperClient {
     List<String> getChildren(String path);
 
     /**
-     * 给path节点绑定一个监听器，其子节点发生变化会触发ChildListener
+     * 给path的所有子节点绑定监听器，其子节点发生变化会触发ChildListener
      * 
      * @param path
      *            path

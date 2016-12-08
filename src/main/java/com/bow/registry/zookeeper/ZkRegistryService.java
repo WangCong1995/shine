@@ -1,9 +1,7 @@
 package com.bow.registry.zookeeper;
 
-import com.bow.common.Version;
 import com.bow.common.utils.NetUtil;
 import com.bow.common.utils.ShineUtils;
-import com.bow.config.ServiceConfig;
 import com.bow.config.ShineConfig;
 import com.bow.registry.RegistryService;
 import com.bow.rpc.Request;
@@ -32,7 +30,7 @@ public class ZkRegistryService implements RegistryService {
     /**
      * key:service所在的全路径
      */
-    private Map<String, List<String>> subscribed = new ConcurrentHashMap<String, List<String>>();
+    private Map<String, List<URL>> subscribed = new ConcurrentHashMap<String, List<URL>>();
 
     public ZkRegistryService() {
         InetSocketAddress address = NetUtil.toSocketAddress(ShineConfig.getRegistryUrl());
@@ -55,33 +53,22 @@ public class ZkRegistryService implements RegistryService {
     @Override
     public List<URL> lookup(Request request) {
         String nodePath = root + ShineUtils.SLASH + ShineUtils.getServiceName(request);
-        List<String> urlStrs = subscribed.get(nodePath);
-        Version requestVersion = new Version(request.getVersion());
-        List<URL> result = new ArrayList<>();
-        for(String urlStr:urlStrs){
-            String v = new String(zookeeperClient.getData(nodePath+ShineUtils.SLASH +urlStr));
-            Version v1 = new Version(v);
-
-            if(requestVersion.imply(v1)){
-                URL url = NetUtil.toURL(urlStr);
-                url.setParameter("version",v);
-                result.add(url);
-            }
-        }
-        return result;
+        // FIXME 判断一下版本号
+        return subscribed.get(nodePath);
     }
 
     @Override
-    public boolean register(ServiceConfig serviceConfig, URL providerUrl) {
-        String nodePath = root + ShineUtils.SLASH + ShineUtils.getServiceName(serviceConfig);
+    public boolean register(URL providerUrl) {
+
+        String nodePath = root + ShineUtils.SLASH + ShineUtils.getServiceName(providerUrl);
         if (!zookeeperClient.exists(nodePath)) {
             zookeeperClient.create(nodePath, false);
         }
         // url 是短暂节点
         nodePath += ShineUtils.SLASH + providerUrl.getAddress();
-        //版本号放到url节点的数据区里
-        byte[] data = serviceConfig.getVersion()==null?null:serviceConfig.getVersion().getBytes();
-        zookeeperClient.create(nodePath, true,data);
+        // 版本号放到url节点的数据区里
+        byte[] data = providerUrl.toString().getBytes();
+        zookeeperClient.create(nodePath, true, data);
         return true;
     }
 
@@ -94,24 +81,34 @@ public class ZkRegistryService implements RegistryService {
     @Override
     public void subscribe(String serviceName) {
         ChildListener childListener = new ChildListener() {
-            /**
-             * 子节点变化后，需要更新本地缓存
-             */
             @Override
             public void childChanged(String path, List<String> children) {
-                subscribed.put(path, children);
-                //FIXME 当children.size=0,触发删除path
+                // 子节点变化后，需要更新本地缓存
+                updateSubscribed(path, children);
             }
         };
-        // 给root添加监听的时候，会获得root下的子节点
+
+        // 给path添加监听时，可以获取到其子节点
         String servicePath = root + ShineUtils.SLASH + serviceName;
         List<String> children = zookeeperClient.addChildListener(servicePath, childListener);
-        if (children != null) {
-            subscribed.put(servicePath, children);
-        } else {
+        updateSubscribed(servicePath, children);
+
+    }
+
+    private void updateSubscribed(String servicePath, List<String> children) {
+        if (children == null || children.size() == 0) {
             logger.warn("no url for service: " + servicePath);
+            zookeeperClient.delete(servicePath);
+            return;
         }
 
+        List<URL> urls = new ArrayList();
+        for (String urlStr : children) {
+            String content = new String(zookeeperClient.getData(servicePath + ShineUtils.SLASH + urlStr));
+            URL url = NetUtil.parse(content);
+            urls.add(url);
+        }
+        subscribed.put(servicePath, urls);
     }
 
     @Override

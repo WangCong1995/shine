@@ -3,6 +3,7 @@ package com.bow.common.utils;
 import com.bow.config.ReferenceConfig;
 import com.bow.config.ServiceConfig;
 import com.bow.rpc.Request;
+import com.bow.rpc.URL;
 
 /**
  * @author vv
@@ -17,15 +18,23 @@ public class ShineUtils {
     public static final String SLASH = "/";
 
     /**
-     * serviceName 如 vv#com.bow.shine.IHello#1.1.1
+     * serviceName 如 vv#com.bow.shine.IHello
      * 
-     * @return groupName#interface#version
+     * @return groupName#interface
      */
     public static String getServiceName(Request request) {
         StringBuilder sb = new StringBuilder();
         sb.append(request.getGroup());
         sb.append(HASH_KEY);
         sb.append(request.getInterfaceName());
+        return sb.toString();
+    }
+
+    public static String getServiceName(URL url) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(url.getStringParam(URL.GROUP));
+        sb.append(HASH_KEY);
+        sb.append(url.getResource());
         return sb.toString();
     }
 

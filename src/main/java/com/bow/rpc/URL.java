@@ -1,25 +1,35 @@
 package com.bow.rpc;
 
-import com.alibaba.fastjson.JSON;
-
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Created by vv on 2016/8/21.
+ * URL
+ *
+ * @author vv
+ * @since 2016/8/21.
  */
 public class URL implements Serializable{
+
+    public static final String DEFAULT_PROTOCOL = "shine";
+    public static final String GROUP = "group";
+    public static final String VERSION = "version";
+
     public URL() {
 
     }
 
     public URL(String host, int port) {
-        this(null, host, port, null);
+        this(DEFAULT_PROTOCOL, host, port, null);
     }
 
     public URL(String host, int port, String resource) {
-        this(null, host, port, resource);
+        this(DEFAULT_PROTOCOL, host, port, resource);
+    }
+
+    public URL(String protocol, String host, int port) {
+        this(protocol, host, port, null);
     }
 
     public URL(String protocol, String host, int port, String resource) {
@@ -88,6 +98,14 @@ public class URL implements Serializable{
         return this.parameters.get(key);
     }
 
+    public String getStringParam(String key){
+        return this.parameters.get(key).toString();
+    }
+
+    public int getIntParam(String key){
+        return Integer.parseInt(getStringParam(key));
+    }
+
     public String getResource() {
         return resource;
     }
@@ -111,7 +129,7 @@ public class URL implements Serializable{
             int index = 0;
             for (Map.Entry<String, Object> parameter : parameters.entrySet()) {
                 sb.append(index == 0 ? "?" : "&");
-                sb.append(parameter.getKey()).append("=").append(JSON.toJSONString(parameter.getValue()));
+                sb.append(parameter.getKey()).append("=").append(parameter.getValue());
                 index++;
             }
         }
