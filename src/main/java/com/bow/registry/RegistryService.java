@@ -1,8 +1,6 @@
 package com.bow.registry;
 
-import com.bow.config.Named;
 import com.bow.config.SPI;
-import com.bow.config.ServiceConfig;
 import com.bow.rpc.Request;
 import com.bow.rpc.URL;
 
@@ -13,7 +11,7 @@ import java.util.List;
  * Created by vv on 2016/8/21.
  */
 @SPI("zookeeper")
-public interface RegistryService extends Named{
+public interface RegistryService{
     /**
      * 根据服务名查找提供该服务的server的地址
      * @param request 组名,接口全限定名,版本号

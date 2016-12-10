@@ -25,13 +25,13 @@ public class NettyClientTest {
     public void call() throws InterruptedException {
         URL url = new URL("127.0.0.1",9000);
         NettyClient client = new NettyClient(url);
-        Request m = new Request();
-        m.setInterfaceName("com.bow.demo.Calculator");
-        m.setMethodName("calculate");
+        Request request = new Request();
+        request.setInterfaceName("com.bow.demo.Calculator");
+        request.setMethodName("calculate");
         Class[] ary = new Class[]{Integer.class,Integer.class};
-        m.setParameterTypes(ary);
-        m.setParameters(new Integer[]{1,2});
-        Response result = client.call(m);
+        request.setParameterTypes(ary);
+        request.setParameters(new Integer[]{1,2});
+        Response result = client.call(request);
         System.out.println(result.getId()+"--"+result.getValue());
         TimeUnit.SECONDS.sleep(Integer.MAX_VALUE);
     }

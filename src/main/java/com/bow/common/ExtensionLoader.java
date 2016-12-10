@@ -3,13 +3,11 @@ package com.bow.common;
 import com.bow.common.exception.ShineException;
 import com.bow.common.exception.ShineExceptionCode;
 import com.bow.config.Name;
-import com.bow.config.Named;
 import com.bow.config.SPI;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.lang.annotation.Annotation;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -28,7 +26,7 @@ public class ExtensionLoader<T> {
 
     private static Logger logger = LoggerFactory.getLogger(ExtensionLoader.class);
 
-    private static ConcurrentMap<Class<?>, ExtensionLoader<?>> extensionLoaders = new ConcurrentHashMap<Class<?>, ExtensionLoader<?>>();
+    private static ConcurrentMap<Class<?>, ExtensionLoader<?>> extensionLoaders = new ConcurrentHashMap();
 
     /**
      * 接口名
@@ -47,14 +45,16 @@ public class ExtensionLoader<T> {
         while (it.hasNext()) {
             T service = it.next();
             // service 有名字，就用其名字存储，否则用其类名存储
-            if (service instanceof Named) {
-                instances.put(((Named) service).getName(), service);
-            } else if (service.getClass().isAnnotationPresent(Name.class)) {
+            if (service.getClass().isAnnotationPresent(Name.class)) {
                 Name nameAnnotation = service.getClass().getAnnotation(Name.class);
                 String name = nameAnnotation.value();
                 instances.put(name, service);
             } else {
-                instances.put(service.getClass().getSimpleName(), service);
+                //小写类名的第一个字母
+                String name = this.getClass().getSimpleName();
+                String first = name.substring(0,1);
+                String remain = name.substring(1);
+                instances.put(first.toLowerCase()+remain, service);
             }
         }
     }
@@ -81,7 +81,13 @@ public class ExtensionLoader<T> {
         return getExtension(null);
     }
 
+    /**
+     * 根据名字获取接口的实现
+     * @param name 实例的名字
+     * @return 接口实例
+     */
     public T getExtension(String name) {
+        //如果name为空就使用 SPI 指定的默认实现
         if (StringUtils.isEmpty(name) && type.isAnnotationPresent(SPI.class)) {
             SPI spi = type.getAnnotation(SPI.class);
             name = spi.value();

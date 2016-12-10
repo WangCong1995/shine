@@ -1,17 +1,13 @@
 package com.bow.config;
 
-import com.alibaba.fastjson.JSON;
 import com.bow.common.ExtensionLoader;
 import com.bow.common.exception.ShineException;
 import com.bow.common.exception.ShineExceptionCode;
 import com.bow.common.pipeline.ClientPipeline;
 import com.bow.common.pipeline.DefaultClientPipeline;
 import com.bow.common.utils.ShineUtils;
-import com.bow.registry.RegistryFactory;
 import com.bow.registry.RegistryService;
 import com.bow.rpc.Request;
-import com.bow.rpc.Protocol;
-import com.bow.rpc.ProtocolFactory;
 import com.bow.rpc.Response;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
@@ -24,17 +20,21 @@ import org.springframework.beans.factory.InitializingBean;
 
 import java.lang.reflect.Method;
 
+
 /**
- * 代理interfaceClass对应的远程实现 Created by vv on 2016/8/19.
+ * 代理interfaceClass对应的远程实现
+ *
+ * @author vv
+ * @since 2016/8/19.
  */
-public class ReferenceBean extends ReferenceConfig
-        implements FactoryBean<Object>, MethodInterceptor, InitializingBean, DisposableBean {
+public class ReferenceBean<S> extends ReferenceConfig<S>
+        implements FactoryBean<S>, MethodInterceptor, InitializingBean, DisposableBean {
 
     private static Logger logger = LoggerFactory.getLogger(ReferenceBean.class);
     /**
      * 客户端调用的代理
      */
-    private Object proxy;
+    private S proxy;
 
     /**
      * 调用方法
@@ -51,7 +51,7 @@ public class ReferenceBean extends ReferenceConfig
         ClientPipeline clientPipeline = DefaultClientPipeline.getInstance();
         Response response = clientPipeline.sendRequest(request);
         if (response.getCause() != null) {
-            throw new ShineException(ShineExceptionCode.fail, response.getCause());
+            throw response.getCause();
         }
         return response.getValue();
     }
@@ -78,7 +78,7 @@ public class ReferenceBean extends ReferenceConfig
     }
 
     @Override
-    public Object getObject() throws Exception {
+    public S getObject() throws Exception {
         // getBean获取的是业务接口的代理
         return proxy;
     }
@@ -100,6 +100,13 @@ public class ReferenceBean extends ReferenceConfig
         String serviceName = ShineUtils.getServiceName(this);
         registryService.subscribe(serviceName);
         logger.debug("subscribed service "+serviceName);
-        this.proxy = new ProxyFactory(getInterfaceClass(), this).getProxy(getInterfaceClass().getClassLoader());
+        initProxy();
+    }
+
+    /**
+     * @see ShineUtils#getServiceName(ServiceConfig)
+     */
+    public void initProxy(){
+        this.proxy = new ProxyFactory().getProxy(getInterfaceClass(), this);
     }
 }

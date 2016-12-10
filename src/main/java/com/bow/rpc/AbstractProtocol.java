@@ -11,6 +11,7 @@ import com.bow.registry.RegistryService;
 import com.bow.remoting.ShineClient;
 import com.bow.remoting.ShineServer;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.List;
@@ -50,15 +51,20 @@ public abstract class AbstractProtocol implements Protocol {
             ServiceConfig serviceConfig = exportedMap.get(serviceName);
             Object proxy = serviceConfig.getRef();
 
-            Response result = new Response(message.getId());
+            Response response = new Response(message.getId());
             try {
                 Method method = proxy.getClass().getMethod(message.getMethodName(), message.getParameterTypes());
                 Object r = method.invoke(proxy, message.getParameters());
-                result.setValue(r);
+                response.setValue(r);
             } catch (Throwable e) {
-                result.setCause(e);
+                if(e instanceof InvocationTargetException){
+                    //把包在外面的InvocationTargetException去除，将真实的exception返回给consumer
+                    response.setCause(((InvocationTargetException) e).getTargetException());
+                }else{
+                    response.setCause(e);
+                }
             }
-            return result;
+            return response;
         }
     };
 
@@ -124,6 +130,8 @@ public abstract class AbstractProtocol implements Protocol {
     protected abstract ShineServer doInitializeServer();
 
     protected abstract ShineClient doInitializeClient(URL serverLocation);
+
+    protected abstract String getName();
 
     private void initRegistryService() {
         registry = ExtensionLoader.getExtensionLoader(RegistryService.class)

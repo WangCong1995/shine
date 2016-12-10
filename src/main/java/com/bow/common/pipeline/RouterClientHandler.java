@@ -1,6 +1,8 @@
 package com.bow.common.pipeline;
 
 import com.bow.common.ExtensionLoader;
+import com.bow.common.exception.ShineException;
+import com.bow.common.exception.ShineExceptionCode;
 import com.bow.common.utils.ShineUtils;
 import com.bow.config.ShineConfig;
 import com.bow.registry.RegistryService;
@@ -36,6 +38,10 @@ public class RouterClientHandler extends ShineHandlerAdapter{
             return;
         }
         List<URL> urls = registry.lookup(request);
+        if(urls == null || urls.size()==0){
+            String errorMsg = ShineUtils.getServiceName(request) + " version " + request.getVersion();
+            throw new ShineException(ShineExceptionCode.noExistsService, errorMsg);
+        }
         URL url= loadBalance.select(serviceName,urls);
         request.setServerUrl(url);
         context.nextSendRequest(message);

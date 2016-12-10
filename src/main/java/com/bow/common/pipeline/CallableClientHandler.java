@@ -3,7 +3,6 @@ package com.bow.common.pipeline;
 import com.bow.common.ExtensionLoader;
 import com.bow.config.ShineConfig;
 import com.bow.rpc.Protocol;
-import com.bow.rpc.ProtocolFactory;
 import com.bow.rpc.Response;
 
 /**

@@ -10,7 +10,7 @@ import java.util.List;
  */
 public interface LoadBalance {
     String RANDOM = "random";
-    String ROUNDROBIN = "roundRobin";
+    String ROUND_ROBIN = "roundRobin";
 
     URL select(String serviceName, List<URL> urls);
 

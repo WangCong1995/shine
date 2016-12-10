@@ -1,16 +1,35 @@
 package com.bow.common;
 
-import java.util.StringTokenizer;
+import org.apache.commons.lang3.StringUtils;
+
 import java.util.regex.Pattern;
 
 /**
- *
+ * 3.2能够调用任何3.2.*的服务
+ * 
+ * <pre>
+ * Version v1 = new Version("3.2.1");
+ * Version v2 = new Version("3.2.2");
+ * Version v3 = new Version("3.2");
+ * Version v4 = new Version();// 没指定版本
+ * Version v5 = new Version("3.2.1.1.1");// 非法，同没指定版本
+ * Assert.assertFalse(v1.matches(v2));
+ * Assert.assertFalse(v1.matches(v3));
+ * // v3版本 能调用v1版本的服务
+ * Assert.assertTrue(v3.matches(v1));
+ * Assert.assertTrue(v4.matches(v1));
+ * Assert.assertTrue(v5.matches(v1));
+ * Assert.assertFalse(v1.matches(v4));
+ * Assert.assertFalse(v1.matches(v5));
+ * </pre>
+ * 
  * @author vv
  * @since 2016/8/30.
  */
 public class Version implements Comparable<Version> {
 
     private static final String REGEXP_SEPARATOR = "\\.";
+
     private static final String SEPARATOR = ".";
 
     private static final Pattern VERSION_PATTERN = Pattern.compile("\\d+(\\.\\d+){0,2}");
@@ -19,7 +38,7 @@ public class Version implements Comparable<Version> {
     }
 
     public Version(String version) {
-        if (VERSION_PATTERN.matcher(version).matches()) {
+        if (StringUtils.isNotEmpty(version) && VERSION_PATTERN.matcher(version).matches()) {
             String[] vs = version.split(REGEXP_SEPARATOR);
             if (vs.length == 3) {
                 major = Integer.parseInt(vs[0]);
@@ -89,6 +108,7 @@ public class Version implements Comparable<Version> {
 
     /**
      * 3.2 大于任何3.2.*
+     * 
      * @param o
      * @return
      */
@@ -104,8 +124,8 @@ public class Version implements Comparable<Version> {
         return result;
     }
 
-    private int null2max(Integer p){
-        if(p==null){
+    private int null2max(Integer p) {
+        if (p == null) {
             return 10000;
         }
         return p;
@@ -142,10 +162,11 @@ public class Version implements Comparable<Version> {
 
     /**
      * 是否包含指定version 如3.2 包含3.2.1
+     * 
      * @param version
      * @return boolean
      */
-    public boolean imply(Version version){
+    public boolean matches(Version version) {
         return version.toString().startsWith(this.toString());
     }
 

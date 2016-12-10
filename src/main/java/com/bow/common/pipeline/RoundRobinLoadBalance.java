@@ -1,5 +1,7 @@
 package com.bow.common.pipeline;
 
+import com.bow.common.exception.ShineException;
+import com.bow.common.exception.ShineExceptionCode;
 import com.bow.config.Name;
 import com.bow.rpc.URL;
 
@@ -11,7 +13,7 @@ import java.util.Map;
  * @author vv
  * @since 2016/10/7.
  */
-@Name("roundRobin")
+@Name(LoadBalance.ROUND_ROBIN)
 public class RoundRobinLoadBalance implements LoadBalance {
     private Map<String,Integer> index = new HashMap<>();
     @Override

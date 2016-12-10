@@ -3,19 +3,21 @@ package com.bow.config;
 import com.bow.rpc.URL;
 
 /**
- * Created by vv on 2016/8/19.
+ *
+ * @author vv
+ * @since 2016/8/19.
  */
-public class ReferenceConfig {
+public class ReferenceConfig<S> {
 
     private String id;
 
     private String interfaceName;
 
-    private Class<?> interfaceClass;
+    private Class<S> interfaceClass;
 
     private String group = "default";
 
-    private String version;
+    private String version="";
 
     private Object mockServiceRef;
 
@@ -56,11 +58,11 @@ public class ReferenceConfig {
         this.interfaceName = interfaceName;
     }
 
-    public Class<?> getInterfaceClass() {
+    public Class<S> getInterfaceClass() {
         return interfaceClass;
     }
 
-    public void setInterfaceClass(Class<?> interfaceClass) {
+    public void setInterfaceClass(Class<S> interfaceClass) {
         this.interfaceClass = interfaceClass;
     }
 

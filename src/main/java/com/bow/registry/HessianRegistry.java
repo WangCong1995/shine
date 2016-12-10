@@ -2,6 +2,7 @@ package com.bow.registry;
 
 import com.bow.common.exception.ShineException;
 import com.bow.common.exception.ShineExceptionCode;
+import com.bow.config.Name;
 import com.bow.config.ServiceConfig;
 import com.bow.config.ShineConfig;
 import com.bow.rpc.Request;
@@ -12,8 +13,10 @@ import java.net.MalformedURLException;
 import java.util.List;
 
 /**
- * Created by vv on 2016/8/21.
+ * @author vv
+ * @since 2016/8/21.
  */
+@Name("hessian")
 public class HessianRegistry implements RegistryService {
 
     private RegistryService proxy;
@@ -51,8 +54,4 @@ public class HessianRegistry implements RegistryService {
 
     }
 
-    @Override
-    public String getName() {
-        return "hessian";
-    }
 }

@@ -1,6 +1,5 @@
 package com.bow.rpc;
 
-import com.bow.config.Named;
 import com.bow.config.SPI;
 import com.bow.config.ServiceConfig;
 
@@ -10,7 +9,7 @@ import com.bow.config.ServiceConfig;
  * @since 2016/8/19.
  */
 @SPI("netty")
-public interface Protocol extends Named {
+public interface Protocol {
 
     /**
      * server export service

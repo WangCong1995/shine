@@ -28,7 +28,6 @@ public class ExtensionLoaderTest {
     @Test
     public void getProtocol(){
         Protocol protocol = ExtensionLoader.getExtensionLoader(Protocol.class).getExtension();
-        System.out.println(protocol.getName());
     }
 
     @Test

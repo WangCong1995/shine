@@ -10,7 +10,7 @@ import java.util.Random;
  * @author vv
  * @since 2016/10/7.
  */
-@Name("random")
+@Name(LoadBalance.RANDOM)
 public class RandomLoadBalance implements LoadBalance {
     private Random random = new Random();
 

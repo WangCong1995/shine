@@ -1,7 +1,6 @@
 package com.bow.config;
 
 import com.bow.rpc.Protocol;
-import com.bow.rpc.ProtocolFactory;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
 

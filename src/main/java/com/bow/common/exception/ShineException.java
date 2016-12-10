@@ -17,11 +17,11 @@ public class ShineException extends RuntimeException {
     }
 
     public ShineException(ShineExceptionCode code, String detailMessage) {
-        this(code.toString() + "--" + detailMessage);
+        this(code.toString() + " -- " + detailMessage);
     }
 
     public ShineException(ShineExceptionCode code, String detailMessage, Throwable e) {
-        this(code.toString() + "--" + detailMessage, e);
+        this(code.toString() + " -- " + detailMessage, e);
     }
 
     public ShineException(ShineExceptionCode code, Throwable e) {

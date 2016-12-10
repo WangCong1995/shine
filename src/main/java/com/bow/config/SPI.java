@@ -7,6 +7,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
+ * 指定接口的默认实现
  * @author vv
  * @since 2016/10/3.
  */

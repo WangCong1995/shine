@@ -6,4 +6,6 @@ package com.bow.demo.integration.api;
 public interface Calculator {
 
     int calculate(int a, int b);
+
+    double divide(int a, int b);
 }

@@ -1,7 +1,9 @@
 package com.bow.registry.zookeeper;
 
+import com.bow.common.Version;
 import com.bow.common.utils.NetUtil;
 import com.bow.common.utils.ShineUtils;
+import com.bow.config.Name;
 import com.bow.config.ShineConfig;
 import com.bow.registry.RegistryService;
 import com.bow.rpc.Request;
@@ -19,11 +21,12 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author vv
  * @since 2016/8/30.
  */
+@Name("zookeeper")
 public class ZkRegistryService implements RegistryService {
 
     private final Logger logger = LoggerFactory.getLogger(ZkRegistryService.class);
 
-    private String root = "/shine";
+    private static final String ROOT = "/shine";
 
     private ZookeeperClient zookeeperClient;
 
@@ -37,8 +40,8 @@ public class ZkRegistryService implements RegistryService {
         URL url = new URL(address.getHostName(), address.getPort());
         zookeeperClient = ZooKeeperClientFactory.getClient(url);
         // 根节点必须为永久的，这样才可以添加子节点
-        if (!zookeeperClient.exists(root)) {
-            zookeeperClient.create(root, false);
+        if (!zookeeperClient.exists(ROOT)) {
+            zookeeperClient.create(ROOT, false);
         }
     }
 
@@ -52,15 +55,39 @@ public class ZkRegistryService implements RegistryService {
      */
     @Override
     public List<URL> lookup(Request request) {
-        String nodePath = root + ShineUtils.SLASH + ShineUtils.getServiceName(request);
-        // FIXME 判断一下版本号
-        return subscribed.get(nodePath);
+        String nodePath = ROOT + ShineUtils.SLASH + ShineUtils.getServiceName(request);
+        String requestVersion = request.getVersion();
+        List<URL> urls = subscribed.get(nodePath);
+        return filterVersion(requestVersion, urls);
+    }
+
+    /**
+     * 根据请求的版本号，过滤服务
+     * 
+     * @param requestVersion
+     *            version
+     * @param urls
+     *            urls
+     * @return List<URL>
+     */
+    private List<URL> filterVersion(String requestVersion, List<URL> urls) {
+        // 注意：这里是重新建了一个list
+        List<URL> available = new ArrayList();
+        Version rv = new Version(requestVersion);
+        for (URL url : urls) {
+            String urlVersion = url.getStringParam(URL.VERSION);
+            Version version = new Version(urlVersion);
+            if (rv.matches(version)) {
+                available.add(url);
+            }
+        }
+        return available;
     }
 
     @Override
     public boolean register(URL providerUrl) {
 
-        String nodePath = root + ShineUtils.SLASH + ShineUtils.getServiceName(providerUrl);
+        String nodePath = ROOT + ShineUtils.SLASH + ShineUtils.getServiceName(providerUrl);
         if (!zookeeperClient.exists(nodePath)) {
             zookeeperClient.create(nodePath, false);
         }
@@ -89,7 +116,7 @@ public class ZkRegistryService implements RegistryService {
         };
 
         // 给path添加监听时，可以获取到其子节点
-        String servicePath = root + ShineUtils.SLASH + serviceName;
+        String servicePath = ROOT + ShineUtils.SLASH + serviceName;
         List<String> children = zookeeperClient.addChildListener(servicePath, childListener);
         updateSubscribed(servicePath, children);
 
@@ -111,8 +138,4 @@ public class ZkRegistryService implements RegistryService {
         subscribed.put(servicePath, urls);
     }
 
-    @Override
-    public String getName() {
-        return "zookeeper";
-    }
 }
