@@ -1,6 +1,7 @@
 package com.bow.rpc;
 
 import com.bow.config.Name;
+import com.bow.config.ShineConfig;
 import com.bow.remoting.ShineClient;
 import com.bow.remoting.ShineServer;
 import com.bow.remoting.netty.NettyClient;
@@ -21,7 +22,7 @@ public class NettyProtocol extends AbstractProtocol {
 
     @Override
     protected ShineServer doInitializeServer() {
-        return new NettyServer();
+        return new NettyServer(ShineConfig.getServicePort());
     }
 
     @Override

@@ -35,6 +35,13 @@ public class ClientTest {
     }
 
     @Test
+    public void refer1(){
+        Calculator calculator = context.getBean(Calculator.class);
+        int result = calculator.calculate(1,1);
+        System.out.println("result>>> "+result);
+    }
+
+    @Test
     public void callWithException(){
         Calculator calculator = context.getBean("c1",Calculator.class);
         try{

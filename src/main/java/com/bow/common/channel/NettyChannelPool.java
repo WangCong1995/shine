@@ -2,7 +2,6 @@ package com.bow.common.channel;
 
 import com.bow.common.exception.ShineException;
 import com.bow.common.exception.ShineExceptionCode;
-import com.bow.config.ShineConfig;
 import com.bow.remoting.netty.NettyClient;
 import org.apache.commons.pool2.PooledObjectFactory;
 import org.apache.commons.pool2.impl.GenericObjectPool;

@@ -2,6 +2,7 @@ package com.bow.remoting.hessian;
 
 import com.bow.common.exception.ShineException;
 import com.bow.common.exception.ShineExceptionCode;
+import com.bow.common.pipeline.DefaultServerPipeline;
 import com.bow.common.pipeline.DefaultShinePipeline;
 import com.bow.common.pipeline.InvokeServiceHandler;
 import com.bow.common.utils.NetUtil;
@@ -28,9 +29,15 @@ import org.slf4j.LoggerFactory;
  */
 public class HessianServer implements ShineServer {
 
-    private static final Logger logger = LoggerFactory.getLogger(HessianServer.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(HessianServer.class);
 
     private RequestHandler requestHandler;
+
+    private int port;
+
+    public HessianServer(int port){
+        this.port = port;
+    }
 
     public void start() {
         if(requestHandler == null){
@@ -39,8 +46,8 @@ public class HessianServer implements ShineServer {
 
         Server server = new Server();
         ServerConnector connector = new ServerConnector(server);
-        connector.setHost(NetUtil.getLocalHostAddress());
-        connector.setPort(ShineConfig.getServicePort());
+//        connector.setHost(NetUtil.getLocalHostAddress());
+        connector.setPort(port);
         server.addConnector(connector);
 
         // 添加servlet
@@ -54,7 +61,7 @@ public class HessianServer implements ShineServer {
 
         try {
             server.start();
-            logger.info("----- success to start jetty server -----");
+            LOGGER.info("----- success to start jetty server -----");
         } catch (Exception e) {
             throw new ShineException(ShineExceptionCode.fail,"fail to start jetty server");
         }
@@ -68,7 +75,8 @@ public class HessianServer implements ShineServer {
     @Override
     public void setRequestHandler(RequestHandler requestHandler) {
         this.requestHandler = requestHandler;
+        //在管道的最后加上响应handler
         InvokeServiceHandler invokeHandler = new InvokeServiceHandler(requestHandler);
-        DefaultShinePipeline.getServerPipeline().addLast(invokeHandler);
+        DefaultServerPipeline.getInstance().addLast(invokeHandler);
     }
 }

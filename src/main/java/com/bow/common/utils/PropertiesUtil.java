@@ -19,8 +19,7 @@ public class PropertiesUtil {
     /**
      * 默认加载的properties文件
      */
-    private static final String[] DEFAULT_PROPERTIES_URL = { "META-INF/default-shine.properties",
-            "META-INF/channel-pool.properties" };
+    private static final String[] DEFAULT_PROPERTIES_URL = {"shine.properties"};
 
     private static Properties properties = new Properties();
 

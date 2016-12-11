@@ -1,6 +1,6 @@
 package com.bow.demo.unit;
 
-import com.bow.common.pipeline.DefaultShinePipeline;
+import com.bow.config.ShineConfig;
 import com.bow.remoting.netty.NettyServer;
 import com.bow.rpc.Request;
 import com.bow.rpc.RequestHandler;
@@ -17,7 +17,7 @@ public class NettyServerTest {
 
     @Test
     public void start() throws InterruptedException {
-        NettyServer server = new NettyServer();
+        NettyServer server = new NettyServer(ShineConfig.getServicePort());
         server.setRequestHandler(new RequestHandler() {
             @Override
             public Response handle(Request message) {

@@ -51,6 +51,12 @@ public class NettyServer implements ShineServer{
 
     private Channel serverChannel;
 
+    private int port;
+
+    public NettyServer(int port){
+        this.port = port;
+    }
+
     private void bind(final int port) throws Exception {
         NettyHelper.setNettyLoggerFactory();
 
@@ -100,7 +106,7 @@ public class NettyServer implements ShineServer{
             if (requestHandler == null) {
                 throw new ShineException("please set requestHandler with NettyServer#setRequestHandler");
             }
-            bind(ShineConfig.getServicePort());
+            bind(port);
         } catch (Exception e) {
             throw new ShineException(ShineExceptionCode.fail, e);
         }

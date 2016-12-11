@@ -5,6 +5,10 @@ package com.bow.common.exception;
  * @since 2016/8/19
  */
 public enum ShineExceptionCode {
+
+    /**
+     * success
+     */
     success(0, "success"),
     /**
      * default description
@@ -34,6 +38,7 @@ public enum ShineExceptionCode {
      * 客户端请求未能正确获取响应（客户端原因）
      */
     clientRequestRefused(105, "client request refused");
+
     private int code;
 
     private String message;

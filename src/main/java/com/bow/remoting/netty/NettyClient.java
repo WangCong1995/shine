@@ -57,9 +57,9 @@ public class NettyClient implements ShineClient {
     private NettyChannelPool pool;
 
     public NettyClient(URL serverUrl) {
+        initBootstrap();
         this.serverUrl = serverUrl;
         this.pool = new NettyChannelPool(this);
-        initBootstrap();
     }
 
     /**

@@ -1,5 +1,6 @@
 package com.bow.demo.unit;
 
+import com.bow.config.ShineConfig;
 import com.bow.remoting.hessian.HessianServer;
 import com.bow.rpc.Request;
 import com.bow.rpc.RequestHandler;
@@ -26,7 +27,7 @@ public class HessianServerTest {
                 return response;
             }
         };
-        HessianServer server = new HessianServer();
+        HessianServer server = new HessianServer(ShineConfig.getServicePort());
         server.setRequestHandler(requestHandler);
         server.start();
         TimeUnit.SECONDS.sleep(Integer.MAX_VALUE);

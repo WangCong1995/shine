@@ -24,7 +24,9 @@ import java.util.concurrent.ConcurrentHashMap;
 @Name("zookeeper")
 public class ZkRegistryService implements RegistryService {
 
-    private final Logger logger = LoggerFactory.getLogger(ZkRegistryService.class);
+    private final Logger LOGGER = LoggerFactory.getLogger(ZkRegistryService.class);
+
+    private static volatile boolean initialized = false;
 
     private static final String ROOT = "/shine";
 
@@ -36,12 +38,23 @@ public class ZkRegistryService implements RegistryService {
     private Map<String, List<URL>> subscribed = new ConcurrentHashMap<String, List<URL>>();
 
     public ZkRegistryService() {
-        InetSocketAddress address = NetUtil.toSocketAddress(ShineConfig.getRegistryUrl());
-        URL url = new URL(address.getHostName(), address.getPort());
-        zookeeperClient = ZooKeeperClientFactory.getClient(url);
-        // 根节点必须为永久的，这样才可以添加子节点
-        if (!zookeeperClient.exists(ROOT)) {
-            zookeeperClient.create(ROOT, false);
+
+    }
+
+    public void ensureClientInitialized() {
+        if (!initialized) {
+            synchronized (this) {
+                if (!initialized) {
+                    InetSocketAddress address = NetUtil.toSocketAddress(ShineConfig.getRegistryUrl());
+                    URL url = new URL(address.getHostName(), address.getPort());
+                    zookeeperClient = ZooKeeperClientFactory.getClient(url);
+                    // 根节点必须为永久的，这样才可以添加子节点
+                    if (!zookeeperClient.exists(ROOT)) {
+                        zookeeperClient.create(ROOT, false);
+                    }
+                    initialized = true;
+                }
+            }
         }
     }
 
@@ -55,6 +68,7 @@ public class ZkRegistryService implements RegistryService {
      */
     @Override
     public List<URL> lookup(Request request) {
+        ensureClientInitialized();
         String nodePath = ROOT + ShineUtils.SLASH + ShineUtils.getServiceName(request);
         String requestVersion = request.getVersion();
         List<URL> urls = subscribed.get(nodePath);
@@ -86,7 +100,7 @@ public class ZkRegistryService implements RegistryService {
 
     @Override
     public boolean register(URL providerUrl) {
-
+        ensureClientInitialized();
         String nodePath = ROOT + ShineUtils.SLASH + ShineUtils.getServiceName(providerUrl);
         if (!zookeeperClient.exists(nodePath)) {
             zookeeperClient.create(nodePath, false);
@@ -107,6 +121,7 @@ public class ZkRegistryService implements RegistryService {
      */
     @Override
     public void subscribe(String serviceName) {
+        ensureClientInitialized();
         ChildListener childListener = new ChildListener() {
             @Override
             public void childChanged(String path, List<String> children) {
@@ -124,7 +139,7 @@ public class ZkRegistryService implements RegistryService {
 
     private void updateSubscribed(String servicePath, List<String> children) {
         if (children == null || children.size() == 0) {
-            logger.warn("no url for service: " + servicePath);
+            LOGGER.warn("no url for service: " + servicePath);
             zookeeperClient.delete(servicePath);
             return;
         }

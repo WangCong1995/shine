@@ -7,8 +7,9 @@ import com.bow.rpc.URL;
 import java.util.List;
 
 /**
- * RegistryService 供服务端或是客户端能调用的api,通过此api注册或是查询到服务信息
- * Created by vv on 2016/8/21.
+ * consumer provider 通过RegistryService操作远端的注册中心
+ * @author vv
+ * @since 2016/8/21.
  */
 @SPI("zookeeper")
 public interface RegistryService{

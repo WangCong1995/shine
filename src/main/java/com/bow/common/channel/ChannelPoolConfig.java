@@ -32,9 +32,6 @@ public class ChannelPoolConfig {
      */
     private long minEvictableIdleTimeMillis;
 
-    /**
-     * 这个清除时会留下MinIdle个不清除
-     */
     private long softMinEvictableIdleTimeMillis;
 
     /**
@@ -52,7 +49,7 @@ public class ChannelPoolConfig {
         // 配置文件中用的秒
         maxWaitMillis = PropertiesUtil.getInt("maxWaitSeconds", 3) * 1000;
         minEvictableIdleTimeMillis = PropertiesUtil.getInt("minEvictableIdleTimeSeconds", 3600) * 1000;
-        softMinEvictableIdleTimeMillis = PropertiesUtil.getInt("softMinEvictableIdleTimeSeconds", 600) * 1000;
+        softMinEvictableIdleTimeMillis = PropertiesUtil.getInt("softMinEvictableIdleTimeSeconds", 3600) * 1000;
         timeBetweenEvictionRunsMillis = PropertiesUtil.getInt("timeBetweenEvictionRunsSeconds", 600) * 1000;
 
         lifo = PropertiesUtil.getBoolean("lifo", true);
