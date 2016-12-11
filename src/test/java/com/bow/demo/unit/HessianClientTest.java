@@ -35,11 +35,11 @@ public class HessianClientTest {
         for(int i=0;i<500;i++){
             //每个data100字节
             BigData data = new BigData();
-            data.setF1("123456789012345");
-            data.setF2("123456789012345");
-            data.setF3("123456789012345");
-            data.setF4("123456789012345");
-            data.setF5("123456789012345");
+//            data.setF1("123456789012345");
+//            data.setF2("123456789012345");
+//            data.setF3("123456789012345");
+//            data.setF4("123456789012345");
+//            data.setF5("123456789012345");
             dataList.add(data);
         }
         request.setParameters(new Object[]{dataList});

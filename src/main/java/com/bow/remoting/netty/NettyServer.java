@@ -18,6 +18,7 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
 import io.netty.handler.codec.serialization.ClassResolvers;
 import io.netty.handler.codec.serialization.ObjectDecoder;
 import io.netty.handler.codec.serialization.ObjectEncoder;
@@ -33,8 +34,12 @@ import org.slf4j.LoggerFactory;
  */
 public class NettyServer implements ShineServer{
 
-    private static final Logger logger = LoggerFactory.getLogger(NettyServer.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(NettyServer.class);
 
+    /**
+     * 单次请求最大3M
+     */
+    private static int maxFrameLength = 1024*1024*3;
     /**
      * 最原始的请求处理类
      */
@@ -58,7 +63,7 @@ public class NettyServer implements ShineServer{
                     public void initChannel(SocketChannel ch) throws Exception {
                         ChannelPipeline p = ch.pipeline();
                         p.addLast(new ObjectEncoder());
-                        p.addLast(new ObjectDecoder(ClassResolvers.cacheDisabled(null)));
+                        p.addLast(new ObjectDecoder(maxFrameLength, ClassResolvers.cacheDisabled(null)));
                         p.addLast(new NettyServerHandler());
                     }
                 });
@@ -67,7 +72,7 @@ public class NettyServer implements ShineServer{
         future.addListener(new ChannelFutureListener() {
             @Override
             public void operationComplete(ChannelFuture future) throws Exception {
-                logger.info("----- success to start netty server -----");
+                LOGGER.info("----- success to start netty server -----");
             }
         });
         serverChannel = future.channel();
@@ -75,7 +80,7 @@ public class NettyServer implements ShineServer{
         closeFuture.addListener(new ChannelFutureListener(){
             @Override
             public void operationComplete(ChannelFuture future) throws Exception {
-                logger.info("close netty server channel");
+                LOGGER.info("close netty server channel");
             }
         });
     }
@@ -106,8 +111,8 @@ public class NettyServer implements ShineServer{
     public void stop() {
         bossGroup.shutdownGracefully();
         workerGroup.shutdownGracefully();
-        if(logger.isInfoEnabled()){
-            logger.info("netty server shutdown");
+        if(LOGGER.isInfoEnabled()){
+            LOGGER.info("netty server shutdown");
         }
     }
 }

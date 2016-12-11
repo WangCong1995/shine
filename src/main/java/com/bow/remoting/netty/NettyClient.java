@@ -17,6 +17,7 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
+import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
 import io.netty.handler.codec.serialization.ClassResolvers;
 import io.netty.handler.codec.serialization.ObjectDecoder;
 import io.netty.handler.codec.serialization.ObjectEncoder;
@@ -91,7 +92,7 @@ public class NettyClient implements ShineClient {
 
         //同步等待响应结果
         ShineFuture<Response> shineFuture = new NettyChannelFuture(request.getId());
-        return shineFuture.get(2000, TimeUnit.MILLISECONDS);
+        return shineFuture.get(60000, TimeUnit.MILLISECONDS);
     }
 
     /**
@@ -109,6 +110,7 @@ public class NettyClient implements ShineClient {
                 ChannelPipeline p = ch.pipeline();
                 //空闲时间超过指定值就触发事件
                 p.addLast(new IdleStateHandler(readerIdleTimeSeconds,writerIdleTimeSeconds,allIdleTimeSeconds));
+                //p.addLast(new LengthFieldBasedFrameDecoder(maxFrameLength,lengthFieldOffset,lengthFieldLength));
                 p.addLast(new ObjectEncoder());
                 p.addLast(new ObjectDecoder(ClassResolvers.cacheDisabled(null)));
                 p.addLast(new NettyClientHandler());

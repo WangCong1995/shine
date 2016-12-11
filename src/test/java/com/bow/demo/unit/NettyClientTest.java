@@ -42,11 +42,12 @@ public class NettyClientTest {
      */
     @Test
     public void testBigData() throws IOException {
-        URL url = new URL("192.168.56.1",9000);
-        HessianClient client = new HessianClient(url);
+        URL url = new URL("127.0.0.1",9000);
+        NettyClient client = new NettyClient(url);
         Request request = new Request();
-        List dataList = new ArrayList();
-        for(int i=0;i<500;i++){
+        int num = 500*65*2;
+        BigData[] dataAry = new BigData[num];
+        for(int i=0;i<num;i++){
             //每个data100字节
             BigData data = new BigData();
             data.setF1("123456789012345");
@@ -54,15 +55,29 @@ public class NettyClientTest {
             data.setF3("123456789012345");
             data.setF4("123456789012345");
             data.setF5("123456789012345");
-            dataList.add(data);
+            dataAry[i] = data;
         }
-        request.setParameters(new Object[]{dataList});
-        ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        ObjectOutputStream oos = new ObjectOutputStream(bos);
-        oos.writeObject(request);
-        System.out.println("request size"+bos.toByteArray().length);
+        request.setParameters(new Object[]{dataAry});
+        size(request);
         Response response = client.call(request);
-        List list = (List) response.getValue();
-        System.out.println(list.size());
+        System.out.println("result>>>"+response.getValue());
+    }
+
+    private void size(Object obj){
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        ObjectOutputStream oos = null;
+        try {
+            oos = new ObjectOutputStream(bos);
+            oos.writeObject(obj);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }finally {
+            try {
+                oos.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        System.out.println("object size "+bos.toByteArray().length);
     }
 }

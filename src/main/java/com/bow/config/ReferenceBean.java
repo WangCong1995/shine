@@ -84,7 +84,7 @@ public class ReferenceBean<S> extends ReferenceConfig<S>
     }
 
     @Override
-    public Class<?> getObjectType() {
+    public Class<S> getObjectType() {
         return getInterfaceClass();
     }
 
