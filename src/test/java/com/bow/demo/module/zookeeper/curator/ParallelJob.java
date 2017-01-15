@@ -1,4 +1,4 @@
-package com.bow.demo.module.zookeeper;
+package com.bow.demo.module.zookeeper.curator;
 
 import java.util.Random;
 import java.util.concurrent.TimeUnit;

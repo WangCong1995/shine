@@ -1,4 +1,4 @@
-package com.bow.demo.module.zookeeper;
+package com.bow.demo.module.zookeeper.curator;
 
 import org.apache.curator.CuratorZookeeperClient;
 import org.apache.curator.RetryPolicy;

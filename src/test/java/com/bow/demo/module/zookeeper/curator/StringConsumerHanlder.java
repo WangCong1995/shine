@@ -1,4 +1,4 @@
-package com.bow.demo.module.zookeeper;
+package com.bow.demo.module.zookeeper.curator;
 
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.recipes.queue.QueueConsumer;

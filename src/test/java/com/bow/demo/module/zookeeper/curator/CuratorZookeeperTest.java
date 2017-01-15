@@ -1,4 +1,4 @@
-package com.bow.demo.module.zookeeper;
+package com.bow.demo.module.zookeeper.curator;
 
 import com.bow.registry.zookeeper.CuratorZookeeperClient;
 import com.bow.rpc.URL;
