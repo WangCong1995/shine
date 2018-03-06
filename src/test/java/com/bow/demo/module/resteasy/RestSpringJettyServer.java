@@ -35,6 +35,7 @@ public class RestSpringJettyServer {
         context.addServlet(servletHolder, "/*");
         context.addEventListener(new ResteasyBootstrap());
         context.addEventListener(new SpringContextLoaderListener());
+        context.setInitParameter("contextConfigLocation", "classpath:root-context.xml");
         server.setHandler(context);
         try {
             server.start();
